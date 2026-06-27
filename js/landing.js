@@ -17,7 +17,7 @@ function generateDemoQR() {
     if (!container) return;
 
     try {
-        const demoUrl = "https://www.scanmenu.africa/menu.html?id=demo";
+        const demoUrl = "https://www.melaninmaps.africa/menu.html?id=demo";
 
         // Use qrcode-generator logic as seen in qr-manager.js
         const qr = qrcode(0, 'H');
@@ -25,7 +25,7 @@ function generateDemoQR() {
         qr.make();
 
         // Create an image tag
-        const imgTag = qr.createImgTag(5, 10, "ScanMenu.Africa Demo Menu");
+        const imgTag = qr.createImgTag(5, 10, "MelaninMaps.africa Demo Menu");
 
         // Inject into container
         container.innerHTML = imgTag;

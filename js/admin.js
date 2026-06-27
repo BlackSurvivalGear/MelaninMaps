@@ -674,7 +674,7 @@ function renderDiagnosticTable(data) {
             btn.innerText = "⌛...";
 
             try {
-                const coords = await progressiveGeocode(biz.address, biz.city, biz.country, 'ScanMenu Africa MelaninMaps Admin');
+                const coords = await progressiveGeocode(biz.address, biz.city, biz.country, 'MelaninMaps™ Admin');
 
                 if (coords) {
                     const lat = coords.lat;
@@ -724,7 +724,7 @@ function exportUsersCSV() {
         csvContent += row + "\n";
     });
 
-    downloadCSV(csvContent, "scanmenu_users.csv");
+    downloadCSV(csvContent, "melaninmaps_users.csv");
 }
 
 function exportRestaurantsCSV() {
@@ -741,13 +741,13 @@ function exportRestaurantsCSV() {
             r.phone,
             r.whatsapp,
             `"${r.address.replace(/"/g, '""')}"`,
-            `https://scanmenu.africa/menu.html?id=${r.uid}`,
+            `https://melaninmaps.africa/menu.html?id=${r.uid}`,
             r.createdAt.toISOString()
         ].join(",");
         csvContent += row + "\n";
     });
 
-    downloadCSV(csvContent, "scanmenu_restaurants.csv");
+    downloadCSV(csvContent, "melaninmaps_restaurants.csv");
 }
 
 function downloadCSV(content, filename) {

@@ -296,12 +296,12 @@ async function renderUsageCard(uid, plan = "preview") {
 
                     if (el.innerText.includes("Custom")) {
                         if (titleEl) titleEl.innerText = "Upgrade to Pro";
-                        if (descEl) descEl.innerText = "Unlock custom categories with ScanMenu.Africa Pro.";
+                        if (descEl) descEl.innerText = "Unlock custom categories with MelaninMaps.africa Pro.";
                         if (upgradeStandardBtn) upgradeStandardBtn.classList.add('hidden');
                         if (upgradeProBtn) upgradeProBtn.classList.remove('hidden');
                     } else {
                         if (titleEl) titleEl.innerText = "Upgrade Your Plan";
-                        if (descEl) descEl.innerText = "Unlock advanced menu categories with ScanMenu.Africa Standard or Pro.";
+                        if (descEl) descEl.innerText = "Unlock advanced menu categories with MelaninMaps.africa Standard or Pro.";
 
                         if (plan === "preview") {
                             if (upgradeStandardBtn) upgradeStandardBtn.classList.remove('hidden');
@@ -410,7 +410,7 @@ if (geocodeBtn) {
                     throw new Error("Business address, city, or country is missing.");
                 }
 
-                const coords = await progressiveGeocode(address, city, country, 'ScanMenu Africa MelaninMaps');
+                const coords = await progressiveGeocode(address, city, country, 'MelaninMaps™');
 
                 if (coords) {
                     const lat = coords.lat;
