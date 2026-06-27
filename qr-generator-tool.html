@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#000000">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MelaninMaps™ | QR Generator</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .qr-editor {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .qr-tool-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 992px) {
+            .qr-tool-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .qr-preview-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: #000;
+        }
+
+        #qr-result-canvas {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .qr-brand-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .qr-brand-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem;
+            background: #fff;
+        }
+
+        .qr-url-display {
+            font-size: 0.85rem;
+            color: #64748b;
+            word-break: break-all;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="melaninmaps-theme">
+    <header>
+        <nav class="container">
+            <a href="toolkit.html" class="logo">
+                <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
+                <span>MelaninMaps™</span>
+            </a>
+            <div class="nav-links">
+                <a href="toolkit.html" class="btn btn-outline btn-small">Back to Toolkit</a>
+                <button id="logout-btn" class="btn btn-outline btn-small">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard-watermark">
+        <div class="container dashboard-content">
+            <h2 style="margin-bottom: 2rem;">QR Generator</h2>
+
+            <div class="qr-tool-grid">
+                <div class="qr-editor">
+                    <h3 style="margin-bottom: 1.5rem;">Configure QR Code</h3>
+
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input id="qr-biz-name" placeholder="e.g. Mama Africa Kitchen">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Destination URL</label>
+                        <input id="qr-url" placeholder="https://melaninmaps.africa/menu.html?id=...">
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            By default, this links to your MelaninMaps™ digital menu.
+                        </p>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="include-logo" checked> Include Business Logo
+                        </label>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+                        <button id="update-qr-btn" class="btn btn-primary btn-full">Update Preview</button>
+                        <button id="download-qr-btn" class="btn btn-secondary btn-full">Download PNG</button>
+                    </div>
+                </div>
+
+                <div id="qr-preview-section">
+                    <div class="qr-preview-card">
+                        <div id="qr-canvas-holder">
+                            <!-- Canvas will be injected here -->
+                        </div>
+                        <img id="preview-logo" src="logo-mm.png" class="qr-brand-logo hidden">
+                        <div id="preview-biz-name" class="qr-brand-name">Business Name</div>
+                        <div id="preview-url" class="qr-url-display">https://melaninmaps.africa/menu...</div>
+
+                        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #f1f5f9; width: 100%;">
+                            <p style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">
+                                Generated by MelaninMaps™ Pro
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/qr-generator-tool.js"></script>
+</body>
+</html>

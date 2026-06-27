@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#000000">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MelaninMaps™ | Invoice Generator</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .invoice-editor {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .editor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        fieldset {
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        legend {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            padding: 0 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .line-items-table {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .line-item-row {
+            display: grid;
+            grid-template-columns: 5fr 2fr 3fr auto;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .remove-item-btn {
+            background: none;
+            border: none;
+            color: var(--error-color);
+            cursor: pointer;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        #invoice-preview-container {
+            margin-top: 3rem;
+            background: #fff;
+            color: #0f172a;
+            padding: 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .preview-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 640px) {
+            .line-item-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+                border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+                padding-bottom: 1rem;
+            }
+
+            .remove-item-btn {
+                text-align: right;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+            }
+        }
+
+        .no-print {
+            display: block;
+        }
+
+        @media print {
+            .no-print, header, footer {
+                display: none !important;
+            }
+            body {
+                background: white;
+            }
+            .dashboard-content {
+                padding: 0;
+            }
+            #invoice-preview-container {
+                box-shadow: none;
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body class="melaninmaps-theme">
+    <header class="no-print">
+        <nav class="container">
+            <a href="toolkit.html" class="logo">
+                <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
+                <span>MelaninMaps™</span>
+            </a>
+            <div class="nav-links">
+                <a href="toolkit.html" class="btn btn-outline btn-small">Back to Toolkit</a>
+                <button id="logout-btn" class="btn btn-outline btn-small">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard-watermark">
+        <div class="container dashboard-content">
+            <h2 class="no-print" style="margin-bottom: 2rem;">Invoice Generator</h2>
+
+            <div class="invoice-editor no-print">
+                <div class="editor-grid">
+                    <div class="editor-col">
+                        <fieldset>
+                            <legend>Your Details</legend>
+                            <div class="form-group">
+                                <label>Business Name</label>
+                                <input id="from-name" placeholder="Your Name / Company">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input id="from-email" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea id="from-address" rows="2" placeholder="Address"></textarea>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Client Details</legend>
+                            <div class="form-group">
+                                <label>Client Name</label>
+                                <input id="to-name" placeholder="Client Name / Company">
+                            </div>
+                            <div class="form-group">
+                                <label>Client Email</label>
+                                <input id="to-email" placeholder="Client Email">
+                            </div>
+                            <div class="form-group">
+                                <label>Client Address</label>
+                                <textarea id="to-address" rows="2" placeholder="Client Address"></textarea>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="editor-col">
+                        <fieldset>
+                            <legend>Invoice Info</legend>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label>Invoice #</label>
+                                    <input id="inv-number" placeholder="001">
+                                </div>
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <input id="inv-date" type="date">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Due Date</label>
+                                <input id="inv-due" type="date">
+                            </div>
+                            <div class="form-group">
+                                <label>Currency</label>
+                                <select id="inv-currency">
+                                    <option value="$">USD ($)</option>
+                                    <option value="£" selected>GBP (£)</option>
+                                    <option value="€">EUR (€)</option>
+                                    <option value="₦">NGN (₦)</option>
+                                    <option value="KSh">KSh (KSh)</option>
+                                    <option value="GH₵">GH₵ (GH₵)</option>
+                                    <option value="R">ZAR (R)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Notes / Terms</label>
+                                <textarea id="inv-notes" rows="2" placeholder="Payment instructions..."></textarea>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Line Items</legend>
+                            <div id="line-items">
+                                <!-- Row template injected here -->
+                            </div>
+                            <button id="add-item-btn" class="btn btn-outline btn-small btn-full" style="margin-top: 1rem;">+ Add Item</button>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <div class="preview-controls">
+                    <button id="preview-invoice-btn" class="btn btn-primary">Preview Invoice</button>
+                    <button id="download-pdf-btn" class="btn btn-secondary hidden">Download PDF</button>
+                </div>
+            </div>
+
+            <!-- PREVIEW AREA -->
+            <div id="invoice-preview-container"></div>
+        </div>
+    </main>
+
+    <script type="module" src="js/invoice-generator.js"></script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#000000">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MelaninMaps™ | Business Toolkit</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .toolkit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tool-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            padding: 2.5rem;
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card:hover:not(.disabled-tool) {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .tool-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .tool-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--primary-color);
+            letter-spacing: 0.1em;
+        }
+
+        .tool-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            flex-grow: 1;
+            line-height: 1.6;
+        }
+
+        .disabled-tool {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .pro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 2rem;
+        }
+
+        .upgrade-card {
+            background: #000;
+            border: 1px solid var(--primary-color);
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.15);
+        }
+
+        .upgrade-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .upgrade-card p {
+            margin-bottom: 2rem;
+        }
+
+        .toolkit-container {
+            position: relative;
+            min-height: 60vh;
+        }
+
+        .blurred-content {
+            filter: blur(5px);
+            pointer-events: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="melaninmaps-theme">
+    <header>
+        <nav class="container">
+            <a href="dashboard.html" class="logo">
+                <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
+                <span>MelaninMaps™</span>
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html" class="btn btn-outline btn-small">Dashboard</a>
+                <button id="logout-btn" class="btn btn-outline btn-small">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard-watermark">
+        <div class="container dashboard-content">
+            <section class="welcome-card">
+                <h2>Business Toolkit <span class="badge badge-featured">PRO</span></h2>
+                <p>Exclusive professional tools for MelaninMaps™ Pro subscribers. Automate your business and professionalize your brand.</p>
+            </section>
+
+            <div id="toolkit-root" class="toolkit-container">
+                <!-- Pro Upgrade Overlay (Hidden by default) -->
+                <div id="pro-upgrade-overlay" class="pro-overlay hidden">
+                    <div class="upgrade-card">
+                        <h2>Unlock MelaninMaps Pro</h2>
+                        <p>The Business Toolkit is available exclusively to Pro subscribers. Upgrade now to unlock professional invoicing, custom QR codes, and more.</p>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <a href="pricing.html" class="btn btn-primary">Upgrade to MelaninMaps Pro</a>
+                            <a href="dashboard.html" class="btn btn-outline">Back to Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="toolkit-content" class="toolkit-grid">
+                    <!-- Invoice Generator -->
+                    <div class="tool-card">
+                        <span class="tool-icon">🧾</span>
+                        <h3 class="tool-name">Invoice Generator</h3>
+                        <p class="tool-description">Create professional branded invoices for your customers instantly.</p>
+                        <a href="invoice-generator.html" class="btn btn-primary btn-full">Launch Invoice Generator</a>
+                    </div>
+
+                    <!-- QR Generator -->
+                    <div class="tool-card">
+                        <span class="tool-icon">📱</span>
+                        <h3 class="tool-name">QR Generator</h3>
+                        <p class="tool-description">Generate professional QR codes for menus, websites, and promotions.</p>
+                        <a href="qr-generator-tool.html" class="btn btn-primary btn-full">Launch QR Generator</a>
+                    </div>
+
+                    <!-- Coming Soon Tools -->
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">📊</span>
+                        <h3 class="tool-name">Sales Dashboard</h3>
+                        <p class="tool-description">Track your revenue and performance with detailed visual reports.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">📅</span>
+                        <h3 class="tool-name">Booking Manager</h3>
+                        <p class="tool-description">Manage your appointments and table reservations in one place.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">📦</span>
+                        <h3 class="tool-name">Inventory Manager</h3>
+                        <p class="tool-description">Keep track of your stock levels and get alerts when items run low.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">👥</span>
+                        <h3 class="tool-name">Staff Scheduler</h3>
+                        <p class="tool-description">Organize staff shifts and manage your team more efficiently.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">💸</span>
+                        <h3 class="tool-name">Expense Tracker</h3>
+                        <p class="tool-description">Monitor your business spending and manage your budget.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">📝</span>
+                        <h3 class="tool-name">Profit & Loss</h3>
+                        <p class="tool-description">Generate financial reports to understand your business health.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">🤖</span>
+                        <h3 class="tool-name">AI Assistant</h3>
+                        <p class="tool-description">Get insights and recommendations for your business growth.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">📢</span>
+                        <h3 class="tool-name">Marketing Toolkit</h3>
+                        <p class="tool-description">Professional tools to promote your brand to more customers.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">🎨</span>
+                        <h3 class="tool-name">Flyer Creator</h3>
+                        <p class="tool-description">Design beautiful promotional materials for your business.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+
+                    <div class="tool-card disabled-tool">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <span class="tool-icon">⭐</span>
+                        <h3 class="tool-name">Customer Reviews</h3>
+                        <p class="tool-description">Manage and respond to feedback from your customers.</p>
+                        <button class="btn btn-outline btn-full" disabled>Launch Tool</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/toolkit.js"></script>
+</body>
+</html>
