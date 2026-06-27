@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Profile - ScanMenu.Africa</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="index.html" class="logo">
+                <img src="logo.png" alt="ScanMenu.Africa" class="logo-icon">
+                <span>ScanMenu.Africa</span>
+            </a>
+            <div class="nav-links">
+                <a href="melanin-map.html" class="btn btn-secondary btn-small">MelaninMaps</a>
+                <button id="logout-btn" class="btn btn-secondary btn-small">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container dashboard-watermark">
+        <div class="auth-container" style="min-height: auto; padding-top: 0;">
+            <div class="auth-card" style="max-width: 500px;">
+                <h2 id="page-title">Restaurant Profile Setup</h2>
+                <p id="page-subtitle">Please provide your business details to get started.</p>
+
+                <div class="logo-upload-container">
+                    <h3>Restaurant Logo</h3>
+                    <div id="logo-preview-box" class="logo-preview-box">
+                        <span id="no-logo-text">No logo uploaded.</span>
+                        <img id="logo-preview" class="logo-preview hidden" src="" alt="Logo Preview">
+                    </div>
+
+                    <input type="file" id="logo-input" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden">
+
+                    <div class="logo-actions" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        <button type="button" id="upload-logo-btn" class="btn btn-secondary btn-small">Upload Logo</button>
+                        <button type="button" id="replace-logo-btn" class="btn btn-secondary btn-small hidden">Replace Logo</button>
+                        <button type="button" id="remove-logo-btn" class="btn btn-secondary btn-small hidden" style="color: var(--error-color); border-color: var(--error-color);">Remove Logo</button>
+                    </div>
+
+                    <div id="upload-progress-container" class="progress-container hidden">
+                        <div id="upload-progress-bar" class="progress-bar"></div>
+                    </div>
+                    <p id="upload-status" class="text-muted hidden" style="font-size: 0.8rem; margin-top: 0.5rem;"></p>
+                </div>
+
+                <form id="restaurant-form">
+                    <div class="form-group">
+                        <label for="businessName">Business Name</label>
+                        <input type="text" id="businessName" required placeholder="e.g. The Italian Bistro">
+                    </div>
+                    <div class="form-group">
+                        <label for="ownerName">Owner Name</label>
+                        <input type="text" id="ownerName" required placeholder="e.g. John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" required placeholder="e.g. +1 234 567 8900">
+                    </div>
+                    <div class="form-group">
+                        <label for="whatsapp">WhatsApp Number</label>
+                        <input type="tel" id="whatsapp" required placeholder="e.g. +1 234 567 8900">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Business Address</label>
+                        <textarea id="address" required placeholder="e.g. 15 Broad Street" style="width: 100%; padding: 0.625rem; border: 1px solid var(--border-color); border-radius: 0.375rem; font-size: 1rem; font-family: inherit; resize: vertical; min-height: 80px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" required placeholder="e.g. Lagos">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <select id="country" required>
+                            <option value="">Select Country</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Business Category</label>
+                        <select id="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Restaurant">Restaurant</option>
+                            <option value="Cafe">Cafe</option>
+                            <option value="Bakery">Bakery</option>
+                            <option value="Bar">Bar</option>
+                            <option value="Hotel">Hotel</option>
+                            <option value="Food Truck">Food Truck</option>
+                            <option value="Food Vendor">Food Vendor</option>
+                            <option value="Catering">Catering</option>
+                            <option value="Takeaway">Takeaway</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cuisine">Cuisine Type</label>
+                        <input type="text" id="cuisine" placeholder="e.g. Nigerian, Ethiopian, Fusion">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Business Email (Optional)</label>
+                        <input type="email" id="email" placeholder="e.g. info@business.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="website">Website (Optional)</label>
+                        <input type="url" id="website" placeholder="https://www.example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="about">About the Business</label>
+                        <textarea id="about" placeholder="Describe your business, heritage, and what makes you unique..." style="width: 100%; padding: 0.625rem; border: 1px solid var(--border-color); border-radius: 0.375rem; font-size: 1rem; font-family: inherit; resize: vertical; min-height: 100px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Social Media Links (Optional)</label>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="url" id="facebook" placeholder="Facebook URL">
+                            <input type="url" id="instagram" placeholder="Instagram URL">
+                            <input type="url" id="tiktok" placeholder="TikTok URL">
+                            <input type="url" id="twitter" placeholder="X (Twitter) URL">
+                            <input type="url" id="youtube" placeholder="YouTube URL">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Order & Delivery Options</label>
+                        <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 1rem;">Configure how customers can order from you.</p>
+
+                        <div style="display: flex; flex-direction: column; gap: 1rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-light);">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="whatsappOrderNumber" style="font-size: 0.8rem;">WhatsApp Order Number</label>
+                                <input type="tel" id="whatsappOrderNumber" placeholder="e.g. +2348012345678">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="orderPhoneNumber" style="font-size: 0.8rem;">Order Phone Number</label>
+                                <input type="tel" id="orderPhoneNumber" placeholder="e.g. +2348012345678">
+                            </div>
+
+                            <div style="margin-top: 1rem;">
+                                <label style="font-size: 0.8rem; display: block; margin-bottom: 0.5rem;">Delivery Platforms & Custom Links</label>
+                                <div id="order-channels-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <!-- Channels will be added here -->
+                                </div>
+                                <button type="button" id="add-channel-btn" class="btn btn-secondary btn-small" style="margin-top: 1rem; width: 100%;">+ Add Order Channel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Opening Hours</label>
+                        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 0.5rem; align-items: center; margin-top: 0.5rem;">
+                            <span>Mon</span> <input type="text" id="hours-monday" placeholder="e.g. 09:00 - 22:00">
+                            <span>Tue</span> <input type="text" id="hours-tuesday" placeholder="e.g. 09:00 - 22:00">
+                            <span>Wed</span> <input type="text" id="hours-wednesday" placeholder="e.g. 09:00 - 22:00">
+                            <span>Thu</span> <input type="text" id="hours-thursday" placeholder="e.g. 09:00 - 22:00">
+                            <span>Fri</span> <input type="text" id="hours-friday" placeholder="e.g. 09:00 - 22:00">
+                            <span>Sat</span> <input type="text" id="hours-saturday" placeholder="e.g. 09:00 - 22:00">
+                            <span>Sun</span> <input type="text" id="hours-sunday" placeholder="e.g. 09:00 - 22:00">
+                        </div>
+                    </div>
+
+                    <div class="logo-upload-container" style="margin-top: 2rem;">
+                        <h3>Cover Photo</h3>
+                        <div id="cover-preview-box" class="logo-preview-box" style="width: 100%; height: 150px;">
+                            <span id="no-cover-text">No cover photo uploaded.</span>
+                            <img id="cover-preview" class="logo-preview hidden" src="" alt="Cover Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <input type="file" id="cover-input" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden">
+                        <div class="logo-actions" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                            <button type="button" id="upload-cover-btn" class="btn btn-secondary btn-small">Upload Cover</button>
+                            <button type="button" id="remove-cover-btn" class="btn btn-secondary btn-small hidden" style="color: var(--error-color); border-color: var(--error-color);">Remove</button>
+                        </div>
+                    </div>
+
+                    <div class="logo-upload-container" style="margin-top: 2rem;">
+                        <h3>Photo Gallery</h3>
+                        <div id="gallery-previews" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; margin-bottom: 1rem;">
+                            <!-- Gallery items here -->
+                        </div>
+                        <input type="file" id="gallery-input" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" multiple>
+                        <button type="button" id="upload-gallery-btn" class="btn btn-secondary btn-small">Add Gallery Photos</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="currency-input">Menu Currency *</label>
+                        <input type="text" id="currency-input" list="currency-list" placeholder="Search and select currency..." required>
+                        <datalist id="currency-list"></datalist>
+                        <input type="hidden" id="currency" name="currency">
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="btn btn-primary btn-full">
+                        <span id="btn-text">Save Profile</span>
+                        <div id="btn-loader" class="loader hidden"></div>
+                    </button>
+
+                    <a href="dashboard.html" id="cancel-btn" class="btn btn-secondary btn-full hidden">Cancel</a>
+                </form>
+
+                <div id="error-message" class="error-box hidden"></div>
+                <div id="success-message" class="success-box hidden" style="background-color: #dcfce7; color: #166534; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; margin-top: 1rem;">
+                    Profile saved successfully! Redirecting...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/restaurant.js"></script>
+</body>
+</html>

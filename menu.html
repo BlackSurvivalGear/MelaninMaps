@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu | ScanMenu.Africa</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="loading-screen" class="loading-container">
+        <div class="loader" style="border-top-color: var(--primary-color); width: 3rem; height: 3rem;"></div>
+        <p style="margin-top: 1rem;">Loading Menu...</p>
+    </div>
+
+    <div id="menu-layout" class="menu-layout-wrapper hidden">
+        <!-- Floating Cart Summary (Desktop: Bottom Right, Mobile: Sticky Bottom) -->
+        <button id="cart-summary" class="cart-summary-btn hidden">
+            <span class="cart-icon">🛒</span>
+            <span class="cart-count">0</span>
+            <span class="cart-total">£0.00</span>
+        </button>
+
+        <!-- Compact Cart Panel -->
+        <div id="cart-panel" class="cart-panel hidden">
+            <div class="cart-header">
+                <h3>Your Order</h3>
+                <button id="close-cart" class="close-btn">&times;</button>
+            </div>
+            <div id="cart-items" class="cart-items-list">
+                <!-- Cart items will be injected here -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total-row">
+                    <span>Total</span>
+                    <span id="cart-total-value">£0.00</span>
+                </div>
+                <button id="whatsapp-order-btn" class="btn btn-whatsapp-order btn-full">
+                    Order on WhatsApp
+                </button>
+            </div>
+        </div>
+
+        <div id="menu-container" class="public-menu">
+            <header class="restaurant-header">
+                <h1 id="res-name" class="restaurant-name"></h1>
+                <p id="res-address" class="restaurant-info"></p>
+                <div id="order-options-container" class="order-options-container">
+                    <!-- Order Channels will be injected here -->
+                </div>
+            </header>
+
+            <main id="menu-content">
+                <!-- Menu items will be injected here -->
+            </main>
+
+            <footer class="public-footer">
+                <p>Powered by <a href="index.html" style="color: inherit; font-weight: 600;">ScanMenu.Africa</a></p>
+                <p style="margin-top: 0.5rem;"><a href="melanin-map.html" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Discover more on MelaninMaps™</a></p>
+            </footer>
+        </div>
+    </div>
+
+    <div id="error-screen" class="empty-state hidden">
+        <h2 id="error-title">Unavailable</h2>
+        <p id="error-message">This menu is currently unavailable.</p>
+        <div style="margin-top: 2rem;">
+            <a href="index.html" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+
+    <script type="module" src="js/public-menu.js"></script>
+</body>
+</html>
