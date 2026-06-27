@@ -45,7 +45,7 @@ function setAuthMode(isRegister) {
     isRegisterMode = isRegister;
     if (isRegisterMode) {
         authTitle.innerText = "Create Account";
-        authSubtitle.innerText = "Join MelaninMaps.africa today!";
+        authSubtitle.innerText = "Join MelaninMaps™ today!";
         btnText.innerText = "Create Account";
         toggleAuthBtn.innerText = "Sign In";
         const switchTextEl = document.getElementById("switch-text");

@@ -25,7 +25,7 @@ function generateDemoQR() {
         qr.make();
 
         // Create an image tag
-        const imgTag = qr.createImgTag(5, 10, "MelaninMaps.africa Demo Menu");
+        const imgTag = qr.createImgTag(5, 10, "MelaninMaps™ Demo Menu");
 
         // Inject into container
         container.innerHTML = imgTag;
