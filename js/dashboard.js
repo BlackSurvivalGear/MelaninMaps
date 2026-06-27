@@ -296,12 +296,12 @@ async function renderUsageCard(uid, plan = "preview") {
 
                     if (el.innerText.includes("Custom")) {
                         if (titleEl) titleEl.innerText = "Upgrade to Pro";
-                        if (descEl) descEl.innerText = "Unlock custom categories with MelaninMaps.africa Pro.";
+                        if (descEl) descEl.innerText = "Unlock custom categories with MelaninMaps™ Pro.";
                         if (upgradeStandardBtn) upgradeStandardBtn.classList.add('hidden');
                         if (upgradeProBtn) upgradeProBtn.classList.remove('hidden');
                     } else {
                         if (titleEl) titleEl.innerText = "Upgrade Your Plan";
-                        if (descEl) descEl.innerText = "Unlock advanced menu categories with MelaninMaps.africa Standard or Pro.";
+                        if (descEl) descEl.innerText = "Unlock advanced menu categories with MelaninMaps™ Standard or Pro.";
 
                         if (plan === "preview") {
                             if (upgradeStandardBtn) upgradeStandardBtn.classList.remove('hidden');
