@@ -35,9 +35,15 @@
 <body class="melaninmaps-theme">
     <header>
         <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
             <a href="index.html" class="logo">
                 <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
-                <span>MelaninMaps™</span>
+                <span class="logo-text">MelaninMaps™</span>
             </a>
             <div class="nav-links">
                 <div class="theme-toggle-container">
@@ -47,34 +53,53 @@
                 <a href="melanin-map.html" class="btn btn-primary btn-small">MelaninMaps</a>
                 <a href="login.html" class="btn btn-outline btn-small">Sign In</a>
             </div>
+
+            <a href="login.html" class="btn btn-outline btn-small mobile-signin mobile-only">Sign In</a>
         </nav>
+        <div id="mobile-menu-overlay" class="mobile-menu-overlay">
+            <div class="mobile-menu-content">
+                <button id="close-mobile-menu" class="close-menu">&times;</button>
+                <div class="mobile-menu-links">
+                    <a href="index.html">Home</a>
+                    <a href="melanin-map.html">Explore Map</a>
+                    <a href="login.html">Sign In</a>
+                    <a href="login.html?mode=register">Join Platform</a>
+                    <div class="mobile-theme-toggle" style="margin-top: 2rem;">
+                        <div class="theme-toggle-container">
+                            <button id="mobile-theme-dark-btn" class="theme-btn">🌙 Dark</button>
+                            <button id="mobile-theme-standard-btn" class="theme-btn">☀ Standard</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </header>
 
     <main class="container" style="padding-top: 3rem; padding-bottom: 4rem;">
-        <div style="text-align: center; margin-bottom: 3rem;">
+        <div class="hero-section-mobile" style="text-align: center; margin-bottom: 3rem;">
             <img src="logo-mm.png" alt="MelaninMaps™ Logo" class="hero-logo">
-            <p class="tagline">Onjẹ • Chakula • Ukudla</p>
-            <p class="hero-description">
+            <p class="tagline desktop-only">Onjẹ • Chakula • Ukudla</p>
+            <p class="hero-description desktop-only">
                 Discover African Food & Hospitality Businesses Worldwide
             </p>
         </div>
 
         <section class="filter-bar">
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group">
                 <label for="search-input">Search</label>
-                <input type="text" id="search-input" placeholder="Business name...">
+                <input type="text" id="search-input" placeholder="Search Businesses...">
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group">
                 <label for="country-filter">Country</label>
                 <select id="country-filter">
                     <option value="">All Countries</option>
                 </select>
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group">
                 <label for="city-filter">City</label>
-                <input type="text" id="city-filter" placeholder="City name...">
+                <input type="text" id="city-filter" placeholder="City">
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group">
                 <label for="category-filter">Category</label>
                 <select id="category-filter">
                     <option value="">All Categories</option>
@@ -89,11 +114,11 @@
                     <option value="Takeaway">Takeaway</option>
                 </select>
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group">
                 <label for="cuisine-filter">Cuisine</label>
-                <input type="text" id="cuisine-filter" placeholder="e.g. Nigerian">
+                <input type="text" id="cuisine-filter" placeholder="Cuisine">
             </div>
-            <button id="apply-filters" class="btn btn-primary" style="height: 42px;">Filter</button>
+            <button id="apply-filters" class="btn btn-primary">EXPLORE MAP</button>
         </section>
 
         <section class="map-container">
@@ -137,5 +162,6 @@
     <!-- Leaflet MarkerCluster JS -->
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script type="module" src="js/map.js"></script>
+    <script type="module" src="js/mobile-menu.js"></script>
 </body>
 </html>

@@ -31,16 +31,36 @@
     <header>
         <div class="container">
             <nav>
+                <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+
                 <a href="index.html" class="logo">
                     <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
-                    <span>MelaninMaps™</span>
+                    <span class="logo-text">MelaninMaps™</span>
                 </a>
+
                 <div class="nav-links">
                     <a href="melanin-map.html" class="btn btn-outline">MelaninMaps</a>
                     <a href="login.html" class="btn btn-outline">Sign In</a>
                     <a href="login.html?mode=register" class="btn btn-primary">Create Account</a>
                 </div>
+
+                <a href="login.html" class="btn btn-outline btn-small mobile-signin mobile-only">Sign In</a>
             </nav>
+        </div>
+        <div id="mobile-menu-overlay" class="mobile-menu-overlay">
+            <div class="mobile-menu-content">
+                <button id="close-mobile-menu" class="close-menu">&times;</button>
+                <div class="mobile-menu-links">
+                    <a href="index.html">Home</a>
+                    <a href="melanin-map.html">Explore Map</a>
+                    <a href="login.html">Sign In</a>
+                    <a href="login.html?mode=register">Join Platform</a>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -194,5 +214,6 @@
 
     <script type="module" src="js/landing.js"></script>
     <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/mobile-menu.js"></script>
 </body>
 </html>
