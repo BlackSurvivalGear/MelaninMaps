@@ -1,6 +1,6 @@
 {
   "name": "functions",
-  "description": "Cloud Functions for ScanMenu.Africa",
+  "description": "Cloud Functions for MelaninMaps.africa",
   "scripts": {
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",

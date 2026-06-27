@@ -539,7 +539,7 @@ if (addChannelBtn) {
  * Geocode address using Nominatim
  */
 async function geocode(address, city, country) {
-    return await progressiveGeocode(address, city, country, 'ScanMenu Africa MelaninMaps');
+    return await progressiveGeocode(address, city, country, 'MelaninMaps™');
 }
 
 restaurantForm.addEventListener("submit", async (e) => {

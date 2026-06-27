@@ -1,1 +1,1 @@
-# menuqr
+MelaninMaps™ is a Pan-African business discovery platform that helps users discover Black-owned businesses, restaurants, services, shops, tourism, accommodation and community organisations across Africa and the global African Diaspora.

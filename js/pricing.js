@@ -133,7 +133,7 @@ function initPayPalButtons(plan) {
         createOrder: (data, actions) => {
             return actions.order.create({
                 purchase_units: [{
-                    description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan - ScanMenu.Africa`,
+                    description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan - MelaninMaps.africa`,
                     amount: {
                         currency_code: "USD",
                         value: PLAN_PRICES[plan]
