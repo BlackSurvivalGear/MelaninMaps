@@ -56,6 +56,7 @@
             <div class="tab-buttons">
                 <button class="tab-btn active" data-tab="users-panel">Users</button>
                 <button class="tab-btn" data-tab="restaurants-panel">Restaurants</button>
+                <button class="tab-btn" data-tab="partners-panel">Partners</button>
                 <button class="tab-btn" data-tab="diagnostic-panel">Map Diagnostics</button>
             </div>
 
@@ -115,6 +116,51 @@
                         <tbody id="diagnostic-table-body">
                             <!-- Diagnostic rows will be injected here -->
                             <tr><td colspan="6" style="text-align: center;">Loading diagnostics...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Partners Panel -->
+            <section id="partners-panel" class="admin-section tab-content hidden">
+                <div class="section-header">
+                    <h3>Partner Management</h3>
+                    <div class="search-box">
+                        <input type="text" id="partner-search" placeholder="Search by name, email or code...">
+                    </div>
+                    <button id="export-partners-btn" class="btn btn-outline btn-small">Export CSV</button>
+                </div>
+
+                <div class="admin-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card" style="padding: 1.5rem;">
+                        <span id="total-partners" class="stat-value" style="font-size: 1.5rem;">...</span>
+                        <span class="stat-label">Total Partners</span>
+                    </div>
+                    <div class="stat-card" style="padding: 1.5rem;">
+                        <span id="pending-commissions" class="stat-value" style="font-size: 1.5rem;">...</span>
+                        <span class="stat-label">Pending Commissions</span>
+                    </div>
+                    <div class="stat-card" style="padding: 1.5rem;">
+                        <span id="paid-commissions" class="stat-value" style="font-size: 1.5rem;">...</span>
+                        <span class="stat-label">Paid Commissions</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="partners-table">
+                        <thead>
+                            <tr>
+                                <th>Partner Name</th>
+                                <th>Referral Code</th>
+                                <th>Businesses</th>
+                                <th>Pending</th>
+                                <th>Paid</th>
+                                <th>Lifetime</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="partners-table-body">
+                            <tr><td colspan="7" style="text-align: center;">Loading partners...</td></tr>
                         </tbody>
                     </table>
                 </div>

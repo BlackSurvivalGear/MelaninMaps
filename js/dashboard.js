@@ -9,7 +9,8 @@ import {
     getDocs,
     onSnapshot,
     updateDoc,
-    serverTimestamp
+    serverTimestamp,
+    runTransaction
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { progressiveGeocode } from "./geocoding.js";
 import { initMenuItems, updateMenuCurrency } from "./menu-items.js";
@@ -280,10 +281,22 @@ async function renderUsageCard(uid, plan = "preview") {
         const upgradeProBtn = document.getElementById('upgrade-pro-btn');
 
         if (upgradeStandardBtn) {
-            upgradeStandardBtn.onclick = () => window.open("https://www.paypal.com/ncp/payment/PU2EMNU3XNUJN", "_blank");
+            upgradeStandardBtn.onclick = () => {
+                if (window.DEVELOPMENT_MODE) {
+                    handleDevelopmentUpgrade(uid, "standard");
+                } else {
+                    window.open("https://www.paypal.com/ncp/payment/PU2EMNU3XNUJN", "_blank");
+                }
+            };
         }
         if (upgradeProBtn) {
-            upgradeProBtn.onclick = () => window.open("https://www.paypal.com/ncp/payment/B3FM4VTP4UPXE", "_blank");
+            upgradeProBtn.onclick = () => {
+                if (window.DEVELOPMENT_MODE) {
+                    handleDevelopmentUpgrade(uid, "pro");
+                } else {
+                    window.open("https://www.paypal.com/ncp/payment/B3FM4VTP4UPXE", "_blank");
+                }
+            };
         }
 
         // Add event listeners to locked stats
@@ -352,6 +365,118 @@ function renderVerificationStatus(restData) {
     statusValue.style.color = color;
     statusDesc.innerText = statusDescription;
     section.classList.remove("hidden");
+}
+
+/**
+ * Handles subscription upgrade in development mode
+ * @param {string} uid
+ * @param {string} planType
+ */
+async function handleDevelopmentUpgrade(uid, planType) {
+    console.log(`Development Upgrade: ${planType} for ${uid}`);
+    const upgradeProBtn = document.getElementById('upgrade-pro-btn');
+    const upgradeStandardBtn = document.getElementById('upgrade-standard-btn');
+
+    if (upgradeProBtn) upgradeProBtn.disabled = true;
+    if (upgradeStandardBtn) upgradeStandardBtn.disabled = true;
+
+    try {
+        // 1. Pre-fetch needed data OUTSIDE transaction
+        const userRef = doc(db, "users", uid);
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) throw "User document does not exist!";
+        const userData = userDoc.data();
+        const referredBy = userData.referredBy;
+
+        let affiliateDoc = null;
+        if (referredBy) {
+            const affQ = query(collection(db, "affiliates"), where("referralCode", "==", referredBy), limit(1));
+            const affSnap = await getDocs(affQ);
+            if (!affSnap.empty) {
+                affiliateDoc = affSnap.docs[0];
+            }
+        }
+
+        const bizRef = doc(db, "businesses", uid);
+        const bizSnap = await getDoc(bizRef);
+        const businessName = bizSnap.exists() ? bizSnap.data().businessName : "Unknown Business";
+
+        // 2. Run Transaction
+        await runTransaction(db, async (transaction) => {
+            const userSnap = await transaction.get(userRef);
+            const userUpdateData = userSnap.data();
+            const currentPlan = userUpdateData.plan || "preview";
+
+            // Prevent duplicate commissions/upgrades if already at this plan or higher
+            if (currentPlan === planType || (currentPlan === "pro" && planType === "standard")) {
+                throw `User is already on ${currentPlan} plan.`;
+            }
+
+            const hasCommission = userUpdateData.commissionGenerated === true;
+
+            // Update User Plan
+            transaction.update(userRef, {
+                plan: planType,
+                subscriptionActivatedAt: serverTimestamp(),
+                activatedBy: "development-test",
+                source: "development-test",
+                commissionGenerated: true
+            });
+
+            // Handle Commission and Referrals if applicable
+            if (affiliateDoc && !hasCommission) {
+                const affiliateUid = affiliateDoc.id;
+                const affiliateRef = doc(db, "affiliates", affiliateUid);
+                const currentAffSnap = await transaction.get(affiliateRef);
+                const currentAffData = currentAffSnap.data();
+
+                const amountPaid = planType === "pro" ? 49.99 : 9.99;
+                const commissionAmount = planType === "pro" ? 15.00 : 3.00;
+
+                // Create Commission Doc
+                const commissionRef = doc(collection(db, "commissions"));
+                transaction.set(commissionRef, {
+                    affiliateId: affiliateUid,
+                    businessId: uid,
+                    businessName: businessName,
+                    subscription: planType.charAt(0).toUpperCase() + planType.slice(1),
+                    amountPaid: amountPaid,
+                    commission: commissionAmount,
+                    status: "Pending",
+                    source: "development-test",
+                    createdAt: serverTimestamp()
+                });
+
+                // Update Affiliate Totals
+                transaction.update(affiliateRef, {
+                    pendingCommission: (currentAffData.pendingCommission || 0) + commissionAmount,
+                    totalBusinesses: (currentAffData.totalBusinesses || 0) + 1,
+                    lifetimeCommission: (currentAffData.lifetimeCommission || 0) + commissionAmount
+                });
+
+                // Update Referral Record
+                const referralRef = doc(db, "referrals", `${affiliateUid}_${uid}`);
+                transaction.update(referralRef, {
+                    subscription: planType.charAt(0).toUpperCase() + planType.slice(1),
+                    status: "Paid"
+                });
+            }
+        });
+
+        alert(`✓ Upgrade Successful\n\nAffiliate commission generated successfully.\n\nDevelopment Test Mode`);
+        const modal = document.getElementById('upgrade-modal');
+        if (modal) modal.classList.add('hidden');
+
+        // Refresh usage card
+        renderUsageCard(uid, planType);
+
+    } catch (error) {
+        console.error("Upgrade error:", error);
+        alert("Upgrade failed: " + error);
+    } finally {
+        if (upgradeProBtn) upgradeProBtn.disabled = false;
+        if (upgradeStandardBtn) upgradeStandardBtn.disabled = false;
+    }
 }
 
 /**

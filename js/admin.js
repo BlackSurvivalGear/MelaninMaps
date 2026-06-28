@@ -25,6 +25,7 @@ import { deleteUser } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-
 let usersData = [];
 let restaurantsData = [];
 let menuItemsData = [];
+let partnersData = [];
 
 let usersPage = 1;
 let restaurantsPage = 1;
@@ -72,6 +73,9 @@ async function init() {
     // Load Diagnostics
     loadDiagnostics();
 
+    // Load Partners
+    loadPartners();
+
     // Event Listeners for Search
     document.getElementById('user-search').addEventListener('input', debounce(() => {
         usersPage = 1;
@@ -83,9 +87,14 @@ async function init() {
         loadBusinesses(document.getElementById('restaurant-search').value);
     }, 500));
 
+    document.getElementById('partner-search').addEventListener('input', debounce(() => {
+        loadPartners(document.getElementById('partner-search').value);
+    }, 500));
+
     // Event Listeners for Exports
     document.getElementById('export-users-btn').addEventListener('click', exportUsersCSV);
     document.getElementById('export-restaurants-btn').addEventListener('click', exportRestaurantsCSV);
+    document.getElementById('export-partners-btn').addEventListener('click', exportPartnersCSV);
 
     // Modal close listeners
     document.getElementById('close-subscription-modal').addEventListener('click', hideSubscriptionModal);
@@ -261,11 +270,31 @@ async function loadStats() {
         const usersCount = await getCountFromServer(collection(db, "users"));
         const businessesCount = await getCountFromServer(collection(db, "businesses"));
         const menuItemsCount = await getCountFromServer(collection(db, "menuItems"));
+        const partnersCount = await getCountFromServer(collection(db, "affiliates"));
 
         document.getElementById('total-users').innerText = usersCount.data().count;
         document.getElementById('total-restaurants').innerText = businessesCount.data().count;
         document.getElementById('total-menu-items').innerText = menuItemsCount.data().count;
         document.getElementById('total-public-menus').innerText = businessesCount.data().count;
+
+        const totalPartnersEl = document.getElementById('total-partners');
+        if (totalPartnersEl) totalPartnersEl.innerText = partnersCount.data().count;
+
+        // Aggregate commissions
+        const commissionsSnap = await getDocs(collection(db, "commissions"));
+        let pending = 0;
+        let paid = 0;
+        commissionsSnap.forEach(doc => {
+            const data = doc.data();
+            if (data.status === "Pending") pending += (data.commission || 0);
+            else if (data.status === "Paid") paid += (data.commission || 0);
+        });
+
+        const pendingEl = document.getElementById('pending-commissions');
+        const paidEl = document.getElementById('paid-commissions');
+        if (pendingEl) pendingEl.innerText = `£${pending.toFixed(2)}`;
+        if (paidEl) paidEl.innerText = `£${paid.toFixed(2)}`;
+
     } catch (error) {
         console.error("Error loading stats:", error);
     }
@@ -591,6 +620,152 @@ function renderBusinessesTable(businesses) {
 }
 
 /**
+ * Load Partners Panel
+ */
+async function loadPartners(searchTerm = "") {
+    const tableBody = document.getElementById('partners-table-body');
+    if (!tableBody) return;
+    tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading partners...</td></tr>';
+
+    try {
+        const q = query(collection(db, "affiliates"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        let partners = [];
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            partners.push({
+                uid: doc.id,
+                name: data.name || "N/A",
+                email: data.email || "N/A",
+                referralCode: data.referralCode || "N/A",
+                totalBusinesses: data.totalBusinesses || 0,
+                pendingCommission: data.pendingCommission || 0,
+                paidCommission: data.paidCommission || 0,
+                lifetimeCommission: data.lifetimeCommission || 0,
+                createdAt: data.createdAt ? data.createdAt.toDate() : new Date()
+            });
+        });
+
+        if (searchTerm) {
+            partners = partners.filter(p =>
+                p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.referralCode.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        partnersData = partners;
+        renderPartnersTable(partners);
+    } catch (error) {
+        console.error("Error loading partners:", error);
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Error loading partners.</td></tr>';
+    }
+}
+
+function renderPartnersTable(partners) {
+    const tableBody = document.getElementById('partners-table-body');
+    tableBody.innerHTML = '';
+
+    if (partners.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No partners found.</td></tr>';
+        return;
+    }
+
+    partners.forEach(partner => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${partner.name}</strong><br><small>${partner.email}</small></td>
+            <td><code>${partner.referralCode}</code></td>
+            <td>${partner.totalBusinesses}</td>
+            <td>£${partner.pendingCommission.toFixed(2)}</td>
+            <td>£${partner.paidCommission.toFixed(2)}</td>
+            <td>£${partner.lifetimeCommission.toFixed(2)}</td>
+            <td>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-primary btn-small mark-paid-btn" data-uid="${partner.uid}">Mark Paid</button>
+                    <button class="btn btn-outline btn-small view-commissions-btn" data-uid="${partner.uid}">Details</button>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(tr);
+    });
+
+    // Mark Paid Event
+    document.querySelectorAll('.mark-paid-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const uid = btn.getAttribute('data-uid');
+            const partner = partners.find(p => p.uid === uid);
+
+            if (partner.pendingCommission <= 0) {
+                alert("No pending commission to pay.");
+                return;
+            }
+
+            if (confirm(`Mark £${partner.pendingCommission.toFixed(2)} as paid for ${partner.name}?`)) {
+                try {
+                    // Fetch pending commissions OUTSIDE the transaction
+                    const commsQ = query(
+                        collection(db, "commissions"),
+                        where("affiliateId", "==", uid),
+                        where("status", "==", "Pending")
+                    );
+                    const commsSnap = await getDocs(commsQ);
+
+                    if (commsSnap.empty) {
+                        alert("No pending commission documents found.");
+                        return;
+                    }
+
+                    await runTransaction(db, async (transaction) => {
+                        const affRef = doc(db, "affiliates", uid);
+                        const affSnap = await transaction.get(affRef);
+                        const affData = affSnap.data();
+
+                        let totalToPay = 0;
+                        commsSnap.forEach(cDoc => {
+                            totalToPay += (cDoc.data().commission || 0);
+                        });
+
+                        const currentPending = affData.pendingCommission || 0;
+                        const currentPaid = affData.paidCommission || 0;
+
+                        // Atomic update: subtract exactly what we found in the documents
+                        transaction.update(affRef, {
+                            pendingCommission: Math.max(0, currentPending - totalToPay),
+                            paidCommission: currentPaid + totalToPay,
+                            updatedAt: serverTimestamp()
+                        });
+
+                        // Update each commission record
+                        commsSnap.forEach(cDoc => {
+                            transaction.update(doc(db, "commissions", cDoc.id), {
+                                status: "Paid",
+                                paidDate: serverTimestamp()
+                            });
+                        });
+                    });
+                    alert(`✓ £${partner.pendingCommission.toFixed(2)} marked as paid.`);
+                    loadPartners();
+                    loadStats();
+                } catch (error) {
+                    console.error("Error marking paid:", error);
+                    alert("Failed to update: " + error);
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll('.view-commissions-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const uid = btn.getAttribute('data-uid');
+            const p = partners.find(part => part.uid === uid);
+            alert(`Partner: ${p.name}\nEmail: ${p.email}\nCode: ${p.referralCode}\nBusinesses: ${p.totalBusinesses}\nLifetime: £${p.lifetimeCommission.toFixed(2)}`);
+        });
+    });
+}
+
+/**
  * Load Diagnostics Panel
  */
 async function loadDiagnostics() {
@@ -725,6 +900,29 @@ function exportUsersCSV() {
     });
 
     downloadCSV(csvContent, "melaninmaps_users.csv");
+}
+
+function exportPartnersCSV() {
+    if (partnersData.length === 0) return;
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Name,Email,Referral Code,Businesses,Pending,Paid,Lifetime,Joined Date\n";
+
+    partnersData.forEach(p => {
+        const row = [
+            `"${p.name.replace(/"/g, '""')}"`,
+            p.email,
+            p.referralCode,
+            p.totalBusinesses,
+            p.pendingCommission,
+            p.paidCommission,
+            p.lifetimeCommission,
+            p.createdAt.toISOString()
+        ].join(",");
+        csvContent += row + "\n";
+    });
+
+    downloadCSV(csvContent, "melaninmaps_partners.csv");
 }
 
 function exportRestaurantsCSV() {

@@ -5,6 +5,11 @@ import {
     getDoc,
     setDoc,
     updateDoc,
+    collection,
+    query,
+    where,
+    getDocs,
+    limit,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import { progressiveGeocode } from "./geocoding.js";
@@ -685,6 +690,28 @@ restaurantForm.addEventListener("submit", async (e) => {
 
         // Use setDoc for both creation and updates
         await setDoc(docRef, businessData);
+
+        // Update business name in referrals collection if it exists
+        try {
+            const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+            if (userDoc.exists() && userDoc.data().referredBy) {
+                const referredBy = userDoc.data().referredBy;
+                const affQ = query(collection(db, "affiliates"), where("referralCode", "==", referredBy), limit(1));
+                const affSnap = await getDocs(affQ);
+                if (!affSnap.empty) {
+                    const affiliateId = affSnap.docs[0].id;
+                    const referralRef = doc(db, "referrals", `${affiliateId}_${auth.currentUser.uid}`);
+                    const referralSnap = await getDoc(referralRef);
+                    if (referralSnap.exists()) {
+                        await updateDoc(referralRef, {
+                            businessName: businessName
+                        });
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Error updating business name in referral:", e);
+        }
 
         showSuccess("Profile saved successfully! Redirecting...");
 

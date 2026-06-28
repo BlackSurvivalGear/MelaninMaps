@@ -79,6 +79,32 @@ service cloud.firestore {
       allow delete: if (request.auth != null && resource.data.restaurantId == request.auth.uid) || isModerator();
     }
 
+    // Affiliate rules
+    match /affiliates/{uid} {
+      allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+      allow create: if request.auth != null && request.auth.uid == uid;
+      // Allow public increment of totalClicks
+      // Allow authenticated users to update commission totals (for business-triggered commissions)
+      allow update: if (request.auth != null && request.auth.uid == uid)
+                    || isAdmin()
+                    || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalClicks']))
+                    || (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pendingCommission', 'totalBusinesses', 'lifetimeCommission']));
+    }
+
+    // Commission rules
+    match /commissions/{commissionId} {
+      allow read: if (request.auth != null && resource.data.affiliateId == request.auth.uid) || isAdmin();
+      allow create: if request.auth != null && request.resource.data.source == "development-test";
+      allow update: if isAdmin();
+    }
+
+    // Referral rules
+    match /referrals/{referralId} {
+      allow read: if (request.auth != null && resource.data.affiliateId == request.auth.uid) || isAdmin();
+      allow create: if request.auth != null;
+      allow update: if (request.auth != null && (resource.data.affiliateId == request.auth.uid || resource.data.businessId == request.auth.uid)) || isAdmin();
+    }
+
     // Order rules
     match /orders/{orderId} {
       allow create: if true;

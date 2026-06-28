@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#000000">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Dashboard | MelaninMaps™</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .partner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .referral-card {
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid var(--primary-color);
+            padding: 2rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 2rem;
+        }
+        .referral-code-display {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin: 1rem 0;
+            letter-spacing: 0.1em;
+        }
+        .referral-link-box {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            word-break: break-all;
+        }
+        .earnings-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .earning-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .earning-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .earning-value {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body class="melaninmaps-theme">
+    <header>
+        <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <a href="index.html" class="logo">
+                <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
+                <span>Partner Program</span>
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html" class="btn btn-outline btn-small">Business Dashboard</a>
+                <button id="logout-btn" class="btn btn-outline btn-small">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container dashboard-watermark">
+        <div class="dashboard-content" style="max-width: 1200px;">
+
+            <!-- Registration View (Hidden by default) -->
+            <section id="partner-registration" class="auth-card hidden" style="margin: 4rem auto; max-width: 500px;">
+                <h2>Join the Program</h2>
+                <p>Become a MelaninMaps™ Partner and earn commission for every business you refer.</p>
+                <button id="join-partner-btn" class="btn btn-primary btn-full">
+                    <span>Activate Partner Account</span>
+                </button>
+            </section>
+
+            <!-- Dashboard View -->
+            <section id="partner-dashboard" class="hidden">
+                <div class="welcome-card">
+                    <h2>Partner Dashboard</h2>
+                    <p>Track your referrals, monitor clicks, and manage your earnings.</p>
+                </div>
+
+                <div class="partner-grid">
+                    <div class="stat-card">
+                        <span id="stat-clicks" class="stat-value">0</span>
+                        <span class="stat-label">Total Clicks</span>
+                    </div>
+                    <div class="stat-card">
+                        <span id="stat-referred" class="stat-value">0</span>
+                        <span class="stat-label">Businesses Referred</span>
+                    </div>
+                    <div class="stat-card">
+                        <span id="stat-paid-subs" class="stat-value">0</span>
+                        <span class="stat-label">Paid Subscriptions</span>
+                    </div>
+                </div>
+
+                <div class="referral-card">
+                    <h3>Your Referral Details</h3>
+                    <div class="referral-code-display" id="display-ref-code">---</div>
+                    <p class="label">Referral Link</p>
+                    <div class="referral-link-box" id="display-ref-link">---</div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button id="copy-ref-link" class="btn btn-primary btn-small">Copy Link</button>
+                        <button id="share-ref-link" class="btn btn-outline btn-small">Share Link</button>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Earnings Summary</h3>
+                    <div class="earnings-summary">
+                        <div class="earning-item">
+                            <div class="earning-label">Pending</div>
+                            <div class="earning-value" id="earn-pending">£0.00</div>
+                        </div>
+                        <div class="earning-item">
+                            <div class="earning-label">Paid</div>
+                            <div class="earning-value" id="earn-paid">£0.00</div>
+                        </div>
+                        <div class="earning-item" style="border: 1px solid var(--primary-color);">
+                            <div class="earning-label">Lifetime</div>
+                            <div class="earning-value" id="earn-lifetime">£0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="referred-businesses">Referred Businesses</button>
+                    <button class="tab-btn" data-tab="commissions-history">Commissions</button>
+                </div>
+
+                <!-- Referred Businesses Table -->
+                <div id="referred-businesses" class="tab-content table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Business Name</th>
+                                <th>Date Joined</th>
+                                <th>Subscription</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="referrals-table-body">
+                            <tr><td colspan="4" style="text-align: center;">No referrals yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Commissions Table -->
+                <div id="commissions-history" class="tab-content hidden table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Business</th>
+                                <th>Subscription</th>
+                                <th>Commission</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody id="commissions-table-body">
+                            <tr><td colspan="6" style="text-align: center;">No commissions earned yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script type="module" src="js/partner.js"></script>
+    <script type="module" src="js/mobile-menu.js"></script>
+</body>
+</html>
