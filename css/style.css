@@ -38,7 +38,7 @@
     --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     --card-shadow: var(--shadow-md);
-    --transition: all 0.3s ease;
+    --transition: all 0.25s ease;
 
     /* Layout */
     --radius: 0.75rem;
@@ -72,24 +72,17 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-.melaninmaps-theme .btn-primary {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-}
-
-.melaninmaps-theme .btn-primary:hover {
-    background-color: var(--text-color);
-    color: var(--bg-color);
-}
-
+.melaninmaps-theme .btn-primary,
 .melaninmaps-theme .btn-outline {
-    border-color: var(--border-color);
-    color: var(--text-color);
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
 }
 
+.melaninmaps-theme .btn-primary:hover,
 .melaninmaps-theme .btn-outline:hover {
-    background-color: var(--bg-light);
+    background-color: var(--primary-color);
+    color: #000000;
 }
 
 .melaninmaps-theme .form-group input,
@@ -211,15 +204,16 @@ p {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
-    color: #000000;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
 }
 
 .btn-primary:hover {
-    filter: brightness(1.1);
+    background-color: var(--primary-color);
+    color: #000000;
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px -2px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
 }
 
 .btn-secondary {
@@ -229,19 +223,23 @@ p {
 }
 
 .btn-secondary:hover {
-    background-color: rgba(212, 175, 55, 0.1);
+    background-color: var(--primary-color);
+    color: #000000;
     transform: translateY(-2px);
-    box-shadow: var(--shadow);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
 }
 
 .btn-outline {
     background-color: transparent;
-    border-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
     color: var(--primary-color);
 }
 
 .btn-outline:hover {
-    background-color: rgba(212, 175, 55, 0.1);
+    background-color: var(--primary-color);
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
 }
 
 .btn-full {
@@ -543,6 +541,10 @@ header {
     display: flex;
     gap: 1.5rem;
     justify-content: center;
+}
+
+.cta-group .btn {
+    min-width: 220px;
 }
 
 /* How It Works Section */
@@ -2114,12 +2116,21 @@ tr:hover {
     border: 1px solid rgba(212, 175, 55, 0.3);
 }
 .map-popup .leaflet-popup-content-wrapper {
-    background: #000;
+    background: rgba(17, 17, 17, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: var(--text-color);
-    border-radius: 0;
+    border-radius: var(--radius);
     padding: 0;
     overflow: hidden;
     border: 1px solid var(--primary-color);
+    box-shadow: var(--shadow-lg);
+}
+.map-popup .leaflet-popup-tip {
+    background: rgba(17, 17, 17, 0.8);
+    border: 1px solid var(--primary-color);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 .map-popup .leaflet-popup-content {
     margin: 0;
@@ -2139,13 +2150,21 @@ tr:hover {
     font-weight: 700;
     font-size: 1.25rem;
     margin-bottom: 0.5rem;
-    color: var(--primary-color);
+    color: #ffffff;
     font-family: 'Cinzel', serif;
 }
 .popup-meta {
     font-size: 0.9rem;
-    color: var(--text-muted);
+    color: var(--secondary-color);
     margin-bottom: 1.25rem;
+}
+.popup-status.status-verified {
+    color: var(--primary-color);
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--primary-color);
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-sm);
+    width: fit-content;
 }
 .popup-actions {
     display: grid;
