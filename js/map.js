@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/fireba
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import firebaseConfig from "./firebase-config.js";
 import { COUNTRIES } from "./countries.js";
+import { DIASPORA_COMMUNITIES, EVENTS, PUBLIC_TRANSPORT, CONNECTIVITY, TOURIST_HIGHLIGHTS } from "./overlays-data.js";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -14,15 +15,44 @@ let markerCluster;
 let businesses = [];
 let currentTheme = 'dark'; // Default theme
 
+// Overlay Layers
+let diasporaLayer;
+let eventsLayer;
+let transportLayer;
+let connectivityLayer;
+let touristLayer;
+let trustedLayer;
+
+let activeLayersState = {
+    selectedCategory: 'food',
+    activeOverlays: []
+};
+
+const CATEGORY_MAP = {
+    'food': ['Restaurant', 'Cafe', 'Bakery', 'Bar', 'Food Truck', 'Food Vendor', 'Catering', 'Takeaway', 'Dessert Shop', 'Juice Bar'],
+    'shopping': ['Grocery Store', 'Market', 'Fashion', 'Beauty', 'Bookstore', 'Electronics', 'Home', 'Artisan', 'Gifts', 'Convenience Store'],
+    'accommodation': ['Hotel', 'Guest House', 'Resort', 'Apartment', 'Hostel', 'Lodge', 'Holiday Rental'],
+    'culture': ['Museum', 'Gallery', 'Cultural Centre', 'Historic Site', 'Library'],
+    'entertainment': ['Nightclub', 'Live Music', 'Theatre', 'Cinema', 'Comedy Club', 'Festival', 'Event Venue'],
+    'travel': ['Tour Operator', 'Travel Agency', 'Car Hire', 'Tourist Attraction', 'Safari', 'Boat Tour'],
+    'health': ['Hospital', 'Clinic', 'Pharmacy', 'Dentist', 'Gym', 'Wellness', 'Massage', 'Mental Health'],
+    'faith': ['Church', 'Mosque', 'Temple', 'Community Organisation', 'NGO', 'Association', 'Community Centre', 'Youth Organisation'],
+    'professional': ['Lawyer', 'Accountant', 'Bank', 'Insurance', 'Real Estate', 'Recruitment', 'Consultant', 'Financial Services'],
+    'education': ['School', 'University', 'College', 'Training Centre', 'Language School', 'Tutor'],
+    'automotive': ['Mechanic', 'Car Dealer', 'Car Wash', 'Fuel Station', 'Auto Parts', 'Vehicle Hire']
+};
+
 // DOM Elements
 const searchInput = document.getElementById('search-input');
 const countryFilter = document.getElementById('country-filter');
 const cityFilter = document.getElementById('city-filter');
-const categoryFilter = document.getElementById('category-filter');
 const cuisineFilter = document.getElementById('cuisine-filter');
 const applyFiltersBtn = document.getElementById('apply-filters');
 const nearMeBtn = document.getElementById('near-me-btn');
 const fullscreenBtn = document.getElementById('map-fullscreen');
+const layersToggleBtn = document.getElementById('layers-toggle');
+const closeLayersBtn = document.getElementById('close-layers');
+const layerPanel = document.getElementById('layer-panel');
 const zoomInBtn = document.getElementById('zoom-in');
 const zoomOutBtn = document.getElementById('zoom-out');
 const mapContainer = document.querySelector('.map-container');
@@ -38,8 +68,29 @@ function initMap() {
 
     updateMapTiles();
 
+    // Restore state
+    const savedState = localStorage.getItem('activeLayersState');
+    if (savedState) {
+        activeLayersState = JSON.parse(savedState);
+        updateUIFromState();
+    }
+
     // Initial fetch
     fetchBusinesses();
+}
+
+function updateUIFromState() {
+    // Update Radio Buttons
+    const radios = document.querySelectorAll('input[name="business-category"]');
+    radios.forEach(radio => {
+        radio.checked = radio.value === activeLayersState.selectedCategory;
+    });
+
+    // Update Checkboxes
+    const checkboxes = document.querySelectorAll('input[name="map-overlay"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = activeLayersState.activeOverlays.includes(checkbox.value);
+    });
 }
 
 /**
@@ -79,7 +130,7 @@ async function fetchBusinesses() {
         });
 
         populateCountryFilter();
-        renderMarkers(businesses);
+        applyFilters(); // Apply initial state and overlays
     } catch (error) {
         console.error("Error fetching businesses:", error);
     }
@@ -108,6 +159,11 @@ function renderMarkers(data) {
     }
 
     markerCluster = L.markerClusterGroup();
+
+    const selectedCategoryTags = CATEGORY_MAP[activeLayersState.selectedCategory] || [];
+    const showVerifiedOnly = activeLayersState.activeOverlays.includes('verified');
+    const showTrendingOnly = activeLayersState.activeOverlays.includes('trending');
+    const showAccessibleOnly = activeLayersState.activeOverlays.includes('accessibility');
 
     // Custom Icons - Theme Aware
     const goldIcon = new L.Icon({
@@ -156,6 +212,26 @@ function renderMarkers(data) {
     });
 
     data.forEach(biz => {
+        // Filter by category
+        if (selectedCategoryTags.length > 0 && !selectedCategoryTags.includes(biz.category)) {
+            return;
+        }
+
+        // Filter by verified if overlay active
+        if (showVerifiedOnly && !biz.verified) {
+            return;
+        }
+
+        // Filter by trending (using profileViews as metric)
+        if (showTrendingOnly && (!biz.profileViews || biz.profileViews < 100)) {
+            return;
+        }
+
+        // Filter by accessibility
+        if (showAccessibleOnly && !biz.isAccessible) {
+            return;
+        }
+
         if (biz.latitude && biz.longitude) {
             let icon;
             let statusText = "Pending Verification";
@@ -228,19 +304,127 @@ function applyFilters() {
     const search = searchInput.value.toLowerCase();
     const country = countryFilter.value;
     const city = cityFilter.value.toLowerCase();
-    const category = categoryFilter.value;
     const cuisine = cuisineFilter.value.toLowerCase();
 
     const filtered = businesses.filter(biz => {
         const matchesSearch = !search || biz.businessName.toLowerCase().includes(search);
         const matchesCountry = !country || biz.country === country;
         const matchesCity = !city || (biz.city && biz.city.toLowerCase().includes(city));
-        const matchesCategory = !category || biz.category === category;
         const matchesCuisine = !cuisine || (biz.cuisine && biz.cuisine.toLowerCase().includes(cuisine));
-        return matchesSearch && matchesCountry && matchesCity && matchesCategory && matchesCuisine;
+        return matchesSearch && matchesCountry && matchesCity && matchesCuisine;
     });
 
     renderMarkers(filtered);
+    updateOverlays();
+}
+
+/**
+ * Update Overlay Layers
+ */
+function updateOverlays() {
+    // 1. Diaspora Communities
+    if (diasporaLayer) map.removeLayer(diasporaLayer);
+    if (activeLayersState.activeOverlays.includes('diaspora')) {
+        diasporaLayer = L.geoJSON(DIASPORA_COMMUNITIES, {
+            style: (feature) => ({
+                fillColor: feature.properties.color || 'gold',
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.4
+            }),
+            onEachFeature: (feature, layer) => {
+                const props = feature.properties;
+                const popupContent = `
+                    <div class="community-popup">
+                        <h3 style="color:var(--primary-color); margin-bottom:0.5rem;">${props.name}</h3>
+                        <p><strong>${props.city}, ${props.country}</strong></p>
+                        <p style="font-size:0.9rem; margin-bottom:1rem;">${props.description}</p>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.85rem; margin-bottom:1rem;">
+                            <span>👥 Pop: ${props.population}</span>
+                            <span>🏗️ Size: ${props.size}</span>
+                            <span>🏢 Biz: ${props.localBusinesses}</span>
+                            <span>🍽️ Food: ${props.restaurants}</span>
+                        </div>
+                        <button class="btn btn-primary btn-small explore-community-btn" data-id="${feature.id}">Explore Businesses</button>
+                    </div>
+                `;
+                layer.bindPopup(popupContent);
+            }
+        }).addTo(map);
+    }
+
+    // 2. Events
+    if (eventsLayer) map.removeLayer(eventsLayer);
+    if (activeLayersState.activeOverlays.includes('events')) {
+        eventsLayer = L.layerGroup();
+        const eventIcon = L.divIcon({className: 'event-marker', html: '🎉', iconSize: [24, 24]});
+        EVENTS.forEach(event => {
+            L.marker(event.location, {icon: eventIcon})
+                .bindPopup(`<strong>${event.name}</strong><br>${event.type}<br>${event.date}`)
+                .addTo(eventsLayer);
+        });
+        eventsLayer.addTo(map);
+    }
+
+    // 3. Transport
+    if (transportLayer) map.removeLayer(transportLayer);
+    if (activeLayersState.activeOverlays.includes('transport')) {
+        transportLayer = L.layerGroup();
+        const transportIcon = L.divIcon({className: 'transport-marker', html: '🚌', iconSize: [24, 24]});
+        PUBLIC_TRANSPORT.forEach(st => {
+            L.marker(st.location, {icon: transportIcon})
+                .bindPopup(`<strong>${st.name}</strong><br>${st.type}`)
+                .addTo(transportLayer);
+        });
+        transportLayer.addTo(map);
+    }
+
+    // 4. Connectivity
+    if (connectivityLayer) map.removeLayer(connectivityLayer);
+    if (activeLayersState.activeOverlays.includes('connectivity')) {
+        connectivityLayer = L.layerGroup();
+        const wifiIcon = L.divIcon({className: 'wifi-marker', html: '📶', iconSize: [24, 24]});
+        CONNECTIVITY.forEach(c => {
+            L.marker(c.location, {icon: wifiIcon})
+                .bindPopup(`<strong>${c.name}</strong><br>${c.type}<br>WiFi: ${c.wifi}`)
+                .addTo(connectivityLayer);
+        });
+        connectivityLayer.addTo(map);
+    }
+
+    // 5. Tourist Highlights
+    if (touristLayer) map.removeLayer(touristLayer);
+    if (activeLayersState.activeOverlays.includes('tourist')) {
+        touristLayer = L.layerGroup();
+        const tourIcon = L.divIcon({className: 'tour-marker', html: '📍', iconSize: [24, 24]});
+        TOURIST_HIGHLIGHTS.forEach(h => {
+            L.marker(h.location, {icon: tourIcon})
+                .bindPopup(`<strong>${h.name}</strong><br>${h.type}`)
+                .addTo(touristLayer);
+        });
+        touristLayer.addTo(map);
+    }
+
+    // 6. Trusted Communities (Using specific property or classification)
+    // For now, we'll reuse the Diaspora data but filter for 'Major Community'
+    if (trustedLayer) map.removeLayer(trustedLayer);
+    if (activeLayersState.activeOverlays.includes('trusted')) {
+        trustedLayer = L.geoJSON(DIASPORA_COMMUNITIES, {
+            filter: (feature) => feature.properties.classification === "Major Community",
+            style: () => ({
+                fillColor: "#D4AF37",
+                weight: 3,
+                opacity: 1,
+                color: "#D4AF37",
+                fillOpacity: 0.6
+            }),
+            onEachFeature: (feature, layer) => {
+                layer.bindPopup(`<strong>🛡️ Trusted Community: ${feature.properties.name}</strong><br>High engagement and verified businesses.`);
+            }
+        }).addTo(map);
+    }
 }
 
 /**
@@ -269,6 +453,50 @@ function nearMe() {
 // Event Listeners
 applyFiltersBtn.addEventListener('click', applyFilters);
 nearMeBtn.addEventListener('click', nearMe);
+
+layersToggleBtn.addEventListener('click', () => {
+    layerPanel.classList.toggle('hidden');
+});
+
+closeLayersBtn.addEventListener('click', () => {
+    layerPanel.classList.add('hidden');
+});
+
+document.querySelectorAll('input[name="business-category"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        activeLayersState.selectedCategory = e.target.value;
+        saveAndRefresh();
+    });
+});
+
+document.querySelectorAll('input[name="map-overlay"]').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            activeLayersState.activeOverlays.push(e.target.value);
+        } else {
+            activeLayersState.activeOverlays = activeLayersState.activeOverlays.filter(id => id !== e.target.value);
+        }
+        saveAndRefresh();
+    });
+});
+
+function saveAndRefresh() {
+    localStorage.setItem('activeLayersState', JSON.stringify(activeLayersState));
+    applyFilters();
+}
+
+// Handle Community Explore Button
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('explore-community-btn')) {
+        const communityId = e.target.dataset.id;
+        const feature = DIASPORA_COMMUNITIES.features.find(f => f.id === communityId);
+        if (feature) {
+            const bounds = L.geoJSON(feature).getBounds();
+            map.fitBounds(bounds);
+            // In a real app, you might also filter businesses by geographic bounds here
+        }
+    }
+});
 
 /**
  * Fullscreen functionality
