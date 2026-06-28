@@ -2121,16 +2121,24 @@ tr:hover {
 
 @media (max-width: 768px) {
     .map-controls {
-        top: 15px;
-        right: 15px;
-        gap: 10px;
+        top: 20px;
+        right: 20px;
+        gap: 0;
     }
 
     .map-controls button {
-        padding: 12px 15px;
-        min-width: 140px;
-        font-size: 0.75rem;
+        padding: 12px 20px;
+        min-width: unset;
+        font-size: 1rem;
         min-height: 48px;
+        background: #000;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        text-transform: none !important;
+    }
+
+    .leaflet-control-attribution {
+        display: none !important;
     }
 }
 
@@ -2187,6 +2195,10 @@ tr:hover {
         font-size: 1.75rem;
         min-height: 48px;
         min-width: 48px;
+        background: #000;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        border-radius: 8px;
     }
 }
 .map-legend {
@@ -2281,14 +2293,17 @@ tr:hover {
 .verification-badge.status-error .status-dot { background-color: var(--attention-color); }
 
 @media (max-width: 768px) {
-    .hero-section-mobile {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        padding: 4rem 1rem;
-        margin-bottom: 2rem !important;
+    .explore-map-page header,
+    .explore-map-page footer,
+    .explore-map-page .filter-bar,
+    .explore-map-page .hero-section-mobile,
+    .explore-map-page main > section:not(.map-container) {
+        display: none !important;
+    }
+
+    .explore-map-page main.container {
+        padding: 0 !important;
+        max-width: none !important;
     }
 
     .hero-logo {
@@ -2331,15 +2346,18 @@ tr:hover {
         margin-top: 1rem;
     }
 
-    #map {
-        height: 500px;
+    .explore-map-page .map-container {
+        height: 100vh;
+        margin-top: 0;
     }
-    .map-legend {
-        position: static;
-        margin-top: 2rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.5rem;
+    .explore-map-page #map {
+        height: 100%;
+    }
+    .explore-map-page #map-fullscreen {
+        display: none !important;
+    }
+    .explore-map-page .map-legend {
+        display: none !important;
     }
     .legend-title {
         width: 100%;
