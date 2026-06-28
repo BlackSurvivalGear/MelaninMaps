@@ -2239,6 +2239,116 @@ tr:hover {
 .dot-pending { background-color: var(--pending-color); }
 .dot-attention { background-color: var(--attention-color); }
 
+/* Layer Panel Styles */
+.layer-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    max-height: calc(100% - 40px);
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--primary-color);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    border-radius: 0.25rem;
+}
+
+.layer-panel.hidden {
+    display: none;
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.layer-panel-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.layer-panel-header h3 {
+    margin-bottom: 0;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+}
+
+.layer-panel-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.layer-section {
+    margin-bottom: 2rem;
+}
+
+.layer-section:last-child {
+    margin-bottom: 0;
+}
+
+.layer-section h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+.layer-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.layer-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.layer-option:hover {
+    color: var(--primary-color);
+}
+
+.layer-option input {
+    accent-color: var(--primary-color);
+    width: 18px;
+    height: 18px;
+}
+
+.layer-option span {
+    flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+    .layer-panel {
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border-radius: 0;
+        border: none;
+    }
+
+    .layer-panel.hidden {
+        transform: translateY(100%);
+    }
+}
+
 .tagline {
     font-size: 1.5rem;
     font-weight: 700;

@@ -66,7 +66,107 @@
         <section class="map-container">
             <div class="map-controls">
                 <button id="map-fullscreen" title="Toggle Fullscreen">⛶ Fullscreen</button>
+                <button id="layers-toggle" title="Layer System"><span style="color: var(--primary-color);">🗺️</span> Layers</button>
                 <button id="near-me-btn" title="Near Me"><span style="color: var(--primary-color);">📍</span> Near Me</button>
+            </div>
+
+            <div id="layer-panel" class="layer-panel hidden">
+                <div class="layer-panel-header">
+                    <h3>Map Layers</h3>
+                    <button id="close-layers" class="close-btn">&times;</button>
+                </div>
+                <div class="layer-panel-content">
+                    <div class="layer-section">
+                        <h4>Business Categories</h4>
+                        <div class="layer-options radio-group">
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="food" checked>
+                                <span>🍽️ Food & Dining</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="shopping">
+                                <span>🛍️ Shopping</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="accommodation">
+                                <span>🏨 Accommodation</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="culture">
+                                <span>🎭 Culture</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="entertainment">
+                                <span>🎉 Entertainment</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="travel">
+                                <span>✈️ Travel & Tourism</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="health">
+                                <span>❤️ Health & Wellness</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="faith">
+                                <span>🙏 Faith & Community</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="professional">
+                                <span>💼 Professional Services</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="education">
+                                <span>🎓 Education</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="radio" name="business-category" value="automotive">
+                                <span>🚗 Automotive</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="layer-section">
+                        <h4>Map Overlays</h4>
+                        <div class="layer-options checkbox-group">
+                            <label class="layer-option">
+                                <input type="checkbox" name="map-overlay" value="diaspora">
+                                <span>🌍 Diaspora Communities</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="checkbox" name="map-overlay" value="verified">
+                                <span>⭐ Verified Businesses</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="checkbox" name="map-overlay" value="trending">
+                                <span>🔥 Trending</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="checkbox" name="map-overlay" value="events">
+                                <span>🎉 Events</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="checkbox" name="map-overlay" value="trusted">
+                                <span>🛡️ Trusted Communities</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="checkbox" name="map-overlay" value="transport">
+                                <span>🚌 Public Transport</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="checkbox" name="map-overlay" value="connectivity">
+                                <span>📶 Connectivity</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="checkbox" name="map-overlay" value="tourist">
+                                <span>📍 Tourist Highlights</span>
+                            </label>
+                            <label class="layer-option">
+                                <input type="checkbox" name="map-overlay" value="accessibility">
+                                <span>♿ Accessibility</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="custom-zoom-controls">
                 <button id="zoom-in" title="Zoom In">+</button>
@@ -104,21 +204,6 @@
             <div class="form-group">
                 <label for="city-filter">City</label>
                 <input type="text" id="city-filter" placeholder="City">
-            </div>
-            <div class="form-group">
-                <label for="category-filter">Category</label>
-                <select id="category-filter">
-                    <option value="">All Categories</option>
-                    <option value="Restaurant">Restaurant</option>
-                    <option value="Cafe">Cafe</option>
-                    <option value="Bakery">Bakery</option>
-                    <option value="Bar">Bar</option>
-                    <option value="Hotel">Hotel</option>
-                    <option value="Food Truck">Food Truck</option>
-                    <option value="Food Vendor">Food Vendor</option>
-                    <option value="Catering">Catering</option>
-                    <option value="Takeaway">Takeaway</option>
-                </select>
             </div>
             <div class="form-group">
                 <label for="cuisine-filter">Cuisine</label>
