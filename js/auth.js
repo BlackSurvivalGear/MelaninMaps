@@ -11,6 +11,13 @@ import {
     doc,
     getDoc,
     setDoc,
+    collection,
+    query,
+    where,
+    getDocs,
+    limit,
+    updateDoc,
+    increment,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import firebaseConfig from "./firebase-config.js";
@@ -34,10 +41,33 @@ const passwordHint = document.getElementById("password-hint");
 let isRegisterMode = false;
 let isRedirectingAfterAuth = false;
 
-// Check URL parameters for registration mode
+// Check URL parameters for registration mode and referral code
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('mode') === 'register') {
     setAuthMode(true);
+}
+
+const refCode = urlParams.get('ref');
+if (refCode) {
+    const cleanCode = refCode.toUpperCase().trim();
+    localStorage.setItem('mm_referral_code', cleanCode);
+    console.log("Referral code captured:", cleanCode);
+
+    // Increment totalClicks on the affiliate document
+    (async () => {
+        try {
+            const q = query(collection(db, "affiliates"), where("referralCode", "==", cleanCode), limit(1));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                const affiliateDoc = querySnapshot.docs[0];
+                await updateDoc(doc(db, "affiliates", affiliateDoc.id), {
+                    totalClicks: increment(1)
+                });
+            }
+        } catch (e) {
+            console.error("Error incrementing clicks:", e);
+        }
+    })();
 }
 
 // Function to toggle between Login and Register
@@ -126,13 +156,46 @@ if (authForm) {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
+                // Get stored referral code
+                const referredBy = localStorage.getItem('mm_referral_code');
+
                 // Create user document in Firestore
-                await setDoc(doc(db, "users", user.uid), {
+                const userDocData = {
                     uid: user.uid,
                     email: user.email,
                     plan: "preview",
                     createdAt: serverTimestamp()
-                });
+                };
+
+                if (referredBy) {
+                    userDocData.referredBy = referredBy;
+
+                    // Create referral document
+                    try {
+                        const affQ = query(collection(db, "affiliates"), where("referralCode", "==", referredBy), limit(1));
+                        const affSnap = await getDocs(affQ);
+                        if (!affSnap.empty) {
+                            const affiliateId = affSnap.docs[0].id;
+                            await setDoc(doc(db, "referrals", `${affiliateId}_${user.uid}`), {
+                                affiliateId: affiliateId,
+                                businessId: user.uid,
+                                businessName: "Pending Profile", // Will be updated when profile is created
+                                joinedAt: serverTimestamp(),
+                                subscription: "Preview",
+                                status: "Pending"
+                            });
+                        }
+                    } catch (e) {
+                        console.error("Error creating referral doc:", e);
+                    }
+                }
+
+                await setDoc(doc(db, "users", user.uid), userDocData);
+
+                // Clear referral code after use
+                if (referredBy) {
+                    localStorage.removeItem('mm_referral_code');
+                }
 
                 isRedirectingAfterAuth = true;
                 window.location.href = "dashboard.html";
