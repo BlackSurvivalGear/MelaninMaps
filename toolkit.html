@@ -131,6 +131,12 @@
 <body class="melaninmaps-theme">
     <header>
         <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
             <a href="dashboard.html" class="logo">
                 <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
                 <span>MelaninMaps™</span>
@@ -143,6 +149,11 @@
     </header>
 
     <main class="dashboard-watermark">
+        <!-- Mobile Hero Logo -->
+        <div class="hero-section-mobile mobile-only">
+            <img src="logo-mm.png" alt="MelaninMaps™ Logo" class="hero-logo">
+        </div>
+
         <div class="container dashboard-content">
             <section class="welcome-card">
                 <h2>Business Toolkit <span class="badge badge-featured">PRO</span></h2>
@@ -265,5 +276,6 @@
     </main>
 
     <script type="module" src="js/toolkit.js"></script>
+    <script type="module" src="js/mobile-menu.js"></script>
 </body>
 </html>

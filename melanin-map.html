@@ -56,23 +56,6 @@
 
             <a href="login.html" class="btn btn-outline btn-small mobile-signin mobile-only">Sign In</a>
         </nav>
-        <div id="mobile-menu-overlay" class="mobile-menu-overlay">
-            <div class="mobile-menu-content">
-                <button id="close-mobile-menu" class="close-menu">&times;</button>
-                <div class="mobile-menu-links">
-                    <a href="index.html">Home</a>
-                    <a href="melanin-map.html">Explore Map</a>
-                    <a href="login.html">Sign In</a>
-                    <a href="login.html?mode=register">Join Platform</a>
-                    <div class="mobile-theme-toggle" style="margin-top: 2rem;">
-                        <div class="theme-toggle-container">
-                            <button id="mobile-theme-dark-btn" class="theme-btn">🌙 Dark</button>
-                            <button id="mobile-theme-standard-btn" class="theme-btn">☀ Standard</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </header>
 
     <main class="container" style="padding-top: 3rem; padding-bottom: 4rem;">
@@ -83,6 +66,26 @@
                 Discover African Food & Hospitality Businesses Worldwide
             </p>
         </div>
+
+        <section class="map-container">
+            <button id="near-me-btn" class="near-me-btn">📍 Near Me</button>
+            <div id="map"></div>
+            <div class="map-legend">
+                <div class="legend-title">MelaninMaps™ Legend</div>
+                <div class="legend-item">
+                    <span class="legend-dot dot-verified"></span>
+                    <span>Verified Businesses</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot dot-pending"></span>
+                    <span>Pending Verification</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot dot-attention"></span>
+                    <span>Needs Attention</span>
+                </div>
+            </div>
+        </section>
 
         <section class="filter-bar">
             <div class="form-group">
@@ -119,26 +122,6 @@
                 <input type="text" id="cuisine-filter" placeholder="Cuisine">
             </div>
             <button id="apply-filters" class="btn btn-primary">EXPLORE MAP</button>
-        </section>
-
-        <section class="map-container">
-            <button id="near-me-btn" class="near-me-btn">📍 Near Me</button>
-            <div id="map"></div>
-            <div class="map-legend">
-                <div class="legend-title">MelaninMaps™ Legend</div>
-                <div class="legend-item">
-                    <span class="legend-dot dot-verified"></span>
-                    <span>Verified Businesses</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-dot dot-pending"></span>
-                    <span>Pending Verification</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-dot dot-attention"></span>
-                    <span>Needs Attention</span>
-                </div>
-            </div>
         </section>
 
         <section style="margin-top: 4rem; text-align: center;">

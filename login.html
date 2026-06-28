@@ -12,6 +12,12 @@
 <body>
     <header>
         <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
             <a href="index.html" class="logo">
                 <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
                 <span>MelaninMaps™</span>
@@ -23,6 +29,10 @@
     </header>
 
     <div class="auth-container">
+        <!-- Mobile Hero Logo -->
+        <div class="hero-section-mobile mobile-only" style="margin-top: -4rem;">
+            <img src="logo-mm.png" alt="MelaninMaps™ Logo" class="hero-logo">
+        </div>
         <div class="auth-card">
             <h2 id="auth-title">Sign In</h2>
             <p id="auth-subtitle">Welcome back! Please enter your details.</p>
@@ -56,5 +66,6 @@
     </div>
 
     <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/mobile-menu.js"></script>
 </body>
 </html>

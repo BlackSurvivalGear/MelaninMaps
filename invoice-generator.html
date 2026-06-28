@@ -125,6 +125,12 @@
 <body class="melaninmaps-theme">
     <header class="no-print">
         <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
             <a href="toolkit.html" class="logo">
                 <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
                 <span>MelaninMaps™</span>
@@ -137,6 +143,11 @@
     </header>
 
     <main class="dashboard-watermark">
+        <!-- Mobile Hero Logo -->
+        <div class="hero-section-mobile mobile-only no-print">
+            <img src="logo-mm.png" alt="MelaninMaps™ Logo" class="hero-logo">
+        </div>
+
         <div class="container dashboard-content">
             <h2 class="no-print" style="margin-bottom: 2rem;">Invoice Generator</h2>
 
@@ -233,5 +244,6 @@
     </main>
 
     <script type="module" src="js/invoice-generator.js"></script>
+    <script type="module" src="js/mobile-menu.js"></script>
 </body>
 </html>

@@ -16,6 +16,12 @@
 <body>
     <header>
         <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
             <a href="index.html" class="logo">
                 <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
                 <span>MelaninMaps™</span>
@@ -29,6 +35,10 @@
     </header>
 
     <main>
+        <!-- Mobile Hero Logo -->
+        <div class="hero-section-mobile mobile-only">
+            <img src="logo-mm.png" alt="MelaninMaps™ Logo" class="hero-logo">
+        </div>
         <section class="pricing-hero">
             <div class="container">
                 <h1>Choose the plan that's right for your restaurant.</h1>
@@ -132,5 +142,6 @@
     </div>
 
     <script type="module" src="js/pricing.js"></script>
+    <script type="module" src="js/mobile-menu.js"></script>
 </body>
 </html>

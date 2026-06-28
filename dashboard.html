@@ -15,6 +15,12 @@
 <body>
     <header>
         <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
             <a href="index.html" class="logo">
                 <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
                 <span>MelaninMaps™</span>
@@ -83,6 +89,11 @@
     </div>
 
     <main class="dashboard-watermark">
+        <!-- Mobile Hero Logo -->
+        <div class="hero-section-mobile mobile-only">
+            <img src="logo-mm.png" alt="MelaninMaps™ Logo" class="hero-logo">
+        </div>
+
         <div class="container dashboard-content">
 
             <section class="welcome-card">
@@ -105,7 +116,7 @@
             </section>
 
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            <div class="dashboard-grid">
                 <!-- Business Profile -->
                 <section id="restaurant-details" class="account-details">
                     <h3 style="display: flex; align-items: center; gap: 0.5rem;">
@@ -169,28 +180,6 @@
                     <div id="qr-error" class="error-box hidden"></div>
                 </section>
 
-                <!-- Business Toolkit Section -->
-                <section id="toolkit-section" class="account-details">
-                    <h3 style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span>⭐ Business Toolkit</span>
-                        <span class="badge badge-featured" style="font-size: 0.6rem;">PRO</span>
-                    </h3>
-                    <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">
-                        Access professional tools to grow and manage your business.
-                    </p>
-
-                    <div style="background: rgba(212, 175, 55, 0.05); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid rgba(212, 175, 55, 0.1); margin-bottom: 1.5rem;">
-                        <ul style="list-style: none; font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;">
-                            <li><span style="color: var(--primary-color);">✓</span> Invoice Generator</li>
-                            <li><span style="color: var(--primary-color);">✓</span> QR Generator</li>
-                            <li><span style="color: var(--primary-color);">✓</span> Premium Support</li>
-                        </ul>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <a href="toolkit.html" class="btn btn-primary btn-full">Launch Toolkit</a>
-                    </div>
-                </section>
             </div>
 
             <!-- Menu Builder -->
@@ -222,6 +211,29 @@
                         <span class="label" style="font-size: 0.8rem; color: var(--text-muted); display: block;">User ID</span>
                         <span id="user-uid" class="value" style="font-size: 0.75rem; color: var(--text-muted);">Loading...</span>
                     </div>
+                </div>
+            </section>
+
+            <!-- Business Toolkit Section -->
+            <section id="toolkit-section" class="account-details" style="margin-top: 1.5rem;">
+                <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>⭐ Business Toolkit</span>
+                    <span class="badge badge-featured" style="font-size: 0.6rem;">PRO</span>
+                </h3>
+                <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    Access professional tools to grow and manage your business.
+                </p>
+
+                <div style="background: rgba(212, 175, 55, 0.05); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid rgba(212, 175, 55, 0.1); margin-bottom: 1.5rem;">
+                    <ul style="list-style: none; font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;">
+                        <li><span style="color: var(--primary-color);">✓</span> Invoice Generator</li>
+                        <li><span style="color: var(--primary-color);">✓</span> QR Generator</li>
+                        <li><span style="color: var(--primary-color);">✓</span> Premium Support</li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <a href="toolkit.html" class="btn btn-primary btn-full">Launch Toolkit</a>
                 </div>
             </section>
         </div>
@@ -258,5 +270,6 @@
     </div>
 
     <script type="module" src="js/dashboard.js"></script>
+    <script type="module" src="js/mobile-menu.js"></script>
 </body>
 </html>

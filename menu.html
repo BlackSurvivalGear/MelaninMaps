@@ -15,7 +15,31 @@
         <p style="margin-top: 1rem;">Loading Menu...</p>
     </div>
 
+    <header>
+        <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <a href="index.html" class="logo">
+                <img src="logo-mm.png" alt="MelaninMaps™" class="logo-icon">
+                <span class="logo-text">MelaninMaps™</span>
+            </a>
+            <div class="nav-links">
+                <a href="melanin-map.html" class="btn btn-outline btn-small">MelaninMaps</a>
+                <a href="login.html" class="btn btn-outline btn-small">Sign In</a>
+            </div>
+        </nav>
+    </header>
+
     <div id="menu-layout" class="menu-layout-wrapper hidden">
+        <!-- Mobile Hero Logo -->
+        <div class="hero-section-mobile mobile-only">
+            <img src="logo-mm.png" alt="MelaninMaps™ Logo" class="hero-logo">
+        </div>
+
         <!-- Floating Cart Summary (Desktop: Bottom Right, Mobile: Sticky Bottom) -->
         <button id="cart-summary" class="cart-summary-btn hidden">
             <span class="cart-icon">🛒</span>
@@ -72,5 +96,6 @@
     </div>
 
     <script type="module" src="js/public-menu.js"></script>
+    <script type="module" src="js/mobile-menu.js"></script>
 </body>
 </html>
