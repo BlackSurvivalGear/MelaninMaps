@@ -323,15 +323,16 @@ nav {
 
     nav {
         height: 70px;
-        padding: 0;
+        padding: 0 1rem;
         display: flex;
         align-items: center;
+        justify-content: space-between;
     }
 
     .nav-container {
         height: 100%;
         width: 100%;
-        padding: 0 1rem;
+        padding: 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -341,10 +342,12 @@ nav {
         display: none !important;
     }
 
-    #mobile-signin-btn {
-        margin: 0;
-        padding: 8px 16px;
-        font-size: 0.9rem;
+    .btn, .theme-btn, .tab-btn, a, button {
+        min-height: 48px;
+    }
+
+    .btn-small {
+        min-height: 40px;
     }
 }
 
@@ -356,8 +359,12 @@ nav {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    padding: 10px;
+    padding: 15px;
     z-index: 1001;
+    min-height: 48px;
+    min-width: 48px;
+    align-items: center;
+    justify-content: center;
 }
 
 .hamburger-line {
@@ -374,7 +381,9 @@ nav {
     left: -100%;
     width: 100%;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.95);
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     z-index: 2000;
     transition: left 0.3s ease;
     display: flex;
@@ -957,9 +966,9 @@ header {
 }
 
 .welcome-card {
-    background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(0, 0, 0, 0.9));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.8), rgba(0, 0, 0, 0.8));
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     color: var(--text-color);
     padding: 4rem;
     border-radius: 0;
@@ -1000,9 +1009,9 @@ header {
 }
 
 .account-details {
-    background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(17, 17, 17, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     padding: 3rem;
     border-radius: 0.25rem;
     box-shadow: var(--shadow-md);
@@ -1083,7 +1092,16 @@ header {
     font-family: 'Cinzel', serif;
 }
 
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
 @media (max-width: 640px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+    }
     .usage-row {
         flex-direction: column;
         gap: 1rem;
@@ -2161,16 +2179,17 @@ tr:hover {
         justify-content: center;
         align-items: center;
         width: 100%;
-        padding: 3rem 0;
+        padding: 4rem 1rem;
         margin-bottom: 2rem !important;
     }
 
     .hero-logo {
-        width: 80%;
-        max-width: 320px;
+        width: 100%;
+        max-width: 500px;
         height: auto;
-        margin: 0;
-        padding: 0;
+        margin: 0 auto;
+        padding: 2rem 0;
+        display: block;
     }
     .tagline {
         font-size: 1.25rem;

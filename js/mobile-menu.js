@@ -1,4 +1,41 @@
+const NAV_DRAWER_HTML = `
+<div id="mobile-menu-overlay" class="mobile-menu-overlay">
+    <div class="mobile-menu-content">
+        <button id="close-mobile-menu" class="close-menu">&times;</button>
+        <div class="mobile-menu-links">
+            <a href="index.html">Home</a>
+            <a href="melanin-map.html">Explore Map</a>
+            <a href="melanin-map.html#categories">Categories</a>
+            <a href="dashboard.html" class="auth-only hidden">Dashboard</a>
+            <a href="restaurant.html?edit=true" class="auth-only hidden">Business Profile</a>
+            <a href="dashboard.html#qr-code" class="auth-only hidden">QR Codes</a>
+            <a href="toolkit.html" class="auth-only hidden pro-only hidden">Business Toolkit</a>
+            <a href="pricing.html">Plans & Pricing</a>
+            <a href="login.html" class="guest-only">Sign In</a>
+            <a href="login.html?mode=register" class="guest-only">Create Account</a>
+            <a href="#" id="mobile-logout-btn" class="auth-only hidden">Logout</a>
+
+            <div class="mobile-theme-toggle" style="margin-top: 2rem;">
+                <div class="theme-toggle-container">
+                    <button id="mobile-theme-dark-btn" class="theme-btn">🌙 Dark</button>
+                    <button id="mobile-theme-standard-btn" class="theme-btn">☀ Standard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+`;
+
+import { auth, db, signOut } from "./auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", () => {
+    // Inject Navigation Drawer if not present
+    if (!document.getElementById("mobile-menu-overlay")) {
+        document.body.insertAdjacentHTML('beforeend', NAV_DRAWER_HTML);
+    }
+
     const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
     const closeMobileMenu = document.getElementById("close-mobile-menu");
     const mobileMenuOverlay = document.getElementById("mobile-menu-overlay");
@@ -20,10 +57,53 @@ document.addEventListener("DOMContentLoaded", () => {
     // Close menu when clicking on a link
     const mobileMenuLinks = document.querySelectorAll(".mobile-menu-links a");
     mobileMenuLinks.forEach(link => {
-        link.addEventListener("click", () => {
-            mobileMenuOverlay.classList.remove("active");
-            document.body.style.overflow = "";
+        if (link.id !== 'mobile-logout-btn') {
+            link.addEventListener("click", () => {
+                mobileMenuOverlay.classList.remove("active");
+                document.body.style.overflow = "";
+            });
+        }
+    });
+
+    // Handle Logout
+    const mobileLogoutBtn = document.getElementById("mobile-logout-btn");
+    if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+                await signOut(auth);
+                window.location.href = "index.html";
+            } catch (error) {
+                console.error("Logout Error:", error);
+            }
         });
+    }
+
+    // Auth State Handling for Menu
+    onAuthStateChanged(auth, async (user) => {
+        const authOnlyLinks = document.querySelectorAll(".auth-only");
+        const guestOnlyLinks = document.querySelectorAll(".guest-only");
+        const proOnlyLinks = document.querySelectorAll(".pro-only");
+
+        if (user) {
+            authOnlyLinks.forEach(link => link.classList.remove("hidden"));
+            guestOnlyLinks.forEach(link => link.classList.add("hidden"));
+
+            // Check for Pro status
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && userDoc.data().plan === 'pro') {
+                    proOnlyLinks.forEach(link => link.classList.remove("hidden"));
+                } else {
+                    proOnlyLinks.forEach(link => link.classList.add("hidden"));
+                }
+            } catch (error) {
+                console.error("Error checking user plan:", error);
+            }
+        } else {
+            authOnlyLinks.forEach(link => link.classList.add("hidden"));
+            guestOnlyLinks.forEach(link => link.classList.remove("hidden"));
+        }
     });
 
     // Theme toggle in mobile menu
@@ -56,16 +136,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Helper to apply theme (matches logic in map.js but made global-safe)
     function applyTheme(theme) {
         document.body.setAttribute('data-theme', theme);
         document.body.classList.add('melaninmaps-theme');
         localStorage.setItem("melaninMapsTheme", theme);
-
-        // Dispatch event for map.js if it's listening or just rely on localStorage
         window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
 
-        // Also update desktop buttons if they exist
         const darkBtn = document.getElementById('theme-dark-btn');
         const standardBtn = document.getElementById('theme-standard-btn');
         if (darkBtn && standardBtn) {
