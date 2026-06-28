@@ -60,15 +60,20 @@
 
     <main class="container" style="padding-top: 3rem; padding-bottom: 4rem;">
         <div class="hero-section-mobile" style="text-align: center; margin-bottom: 3rem;">
-            <img src="logo-mm.png" alt="MelaninMaps™ Logo" class="hero-logo">
-            <p class="tagline desktop-only">Onjẹ • Chakula • Ukudla</p>
-            <p class="hero-description desktop-only">
-                Discover African Food & Hospitality Businesses Worldwide
-            </p>
+            <img src="logo-mm.png" alt="MelaninMaps™" class="hero-logo" onerror="this.onerror=null; this.src='assets/images/MM Logo.png';">
         </div>
 
         <section class="map-container">
-            <button id="near-me-btn" class="near-me-btn">📍 Near Me</button>
+            <div class="map-controls">
+                <button id="map-max" title="Maximize Map">Max</button>
+                <button id="map-min" title="Minimize Map">Min</button>
+                <button id="map-default" title="Default Size">Default</button>
+                <button id="near-me-btn" title="Near Me">Near Me</button>
+            </div>
+            <div class="custom-zoom-controls">
+                <button id="zoom-in" title="Zoom In">+</button>
+                <button id="zoom-out" title="Zoom Out">−</button>
+            </div>
             <div id="map"></div>
             <div class="map-legend">
                 <div class="legend-title">MelaninMaps™ Legend</div>

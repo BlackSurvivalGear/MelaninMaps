@@ -22,13 +22,21 @@ const categoryFilter = document.getElementById('category-filter');
 const cuisineFilter = document.getElementById('cuisine-filter');
 const applyFiltersBtn = document.getElementById('apply-filters');
 const nearMeBtn = document.getElementById('near-me-btn');
+const mapMaxBtn = document.getElementById('map-max');
+const mapMinBtn = document.getElementById('map-min');
+const mapDefaultBtn = document.getElementById('map-default');
+const zoomInBtn = document.getElementById('zoom-in');
+const zoomOutBtn = document.getElementById('zoom-out');
+const mapContainer = document.querySelector('.map-container');
 
 /**
  * Initialize the map
  */
 function initMap() {
     // Default center (Africa context)
-    map = L.map('map').setView([0, 20], 3);
+    map = L.map('map', {
+        zoomControl: false // We will add custom zoom controls later
+    }).setView([0, 20], 3);
 
     updateMapTiles();
 
@@ -263,6 +271,36 @@ function nearMe() {
 // Event Listeners
 applyFiltersBtn.addEventListener('click', applyFilters);
 nearMeBtn.addEventListener('click', nearMe);
+
+mapMaxBtn.addEventListener('click', () => {
+    mapContainer.classList.remove('map-min', 'map-default');
+    mapContainer.classList.add('map-max');
+});
+
+mapMinBtn.addEventListener('click', () => {
+    mapContainer.classList.remove('map-max', 'map-default');
+    mapContainer.classList.add('map-min');
+});
+
+mapDefaultBtn.addEventListener('click', () => {
+    mapContainer.classList.remove('map-max', 'map-min');
+    mapContainer.classList.add('map-default');
+});
+
+// Handle map resize after transition
+mapContainer.addEventListener('transitionend', (e) => {
+    if (e.propertyName === 'height') {
+        map.invalidateSize({ pan: true });
+    }
+});
+
+zoomInBtn.addEventListener('click', () => {
+    map.zoomIn();
+});
+
+zoomOutBtn.addEventListener('click', () => {
+    map.zoomOut();
+});
 
 /**
  * Theme Management
