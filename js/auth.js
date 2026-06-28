@@ -56,11 +56,11 @@ if (refCode) {
     // Increment totalClicks on the affiliate document
     (async () => {
         try {
-            const q = query(collection(db, "affiliates"), where("referralCode", "==", cleanCode), limit(1));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                const affiliateDoc = querySnapshot.docs[0];
-                await updateDoc(doc(db, "affiliates", affiliateDoc.id), {
+            const codeRef = doc(db, "referralCodes", cleanCode);
+            const codeSnap = await getDoc(codeRef);
+            if (codeSnap.exists()) {
+                const affiliateUid = codeSnap.data().uid;
+                await updateDoc(doc(db, "affiliates", affiliateUid), {
                     totalClicks: increment(1)
                 });
             }
@@ -172,10 +172,10 @@ if (authForm) {
 
                     // Create referral document
                     try {
-                        const affQ = query(collection(db, "affiliates"), where("referralCode", "==", referredBy), limit(1));
-                        const affSnap = await getDocs(affQ);
-                        if (!affSnap.empty) {
-                            const affiliateId = affSnap.docs[0].id;
+                        const codeRef = doc(db, "referralCodes", referredBy);
+                        const codeSnap = await getDoc(codeRef);
+                        if (codeSnap.exists()) {
+                            const affiliateId = codeSnap.data().uid;
                             await setDoc(doc(db, "referrals", `${affiliateId}_${user.uid}`), {
                                 affiliateId: affiliateId,
                                 businessId: user.uid,

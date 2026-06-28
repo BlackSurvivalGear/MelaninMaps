@@ -696,10 +696,10 @@ restaurantForm.addEventListener("submit", async (e) => {
             const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
             if (userDoc.exists() && userDoc.data().referredBy) {
                 const referredBy = userDoc.data().referredBy;
-                const affQ = query(collection(db, "affiliates"), where("referralCode", "==", referredBy), limit(1));
-                const affSnap = await getDocs(affQ);
-                if (!affSnap.empty) {
-                    const affiliateId = affSnap.docs[0].id;
+                const codeRef = doc(db, "referralCodes", referredBy);
+                const codeSnap = await getDoc(codeRef);
+                if (codeSnap.exists()) {
+                    const affiliateId = codeSnap.data().uid;
                     const referralRef = doc(db, "referrals", `${affiliateId}_${auth.currentUser.uid}`);
                     const referralSnap = await getDoc(referralRef);
                     if (referralSnap.exists()) {
