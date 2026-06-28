@@ -67,6 +67,13 @@ joinBtn.addEventListener("click", async () => {
         };
 
         await setDoc(doc(db, "affiliates", user.uid), affiliateData);
+
+        // Create public mapping for referral code lookup
+        await setDoc(doc(db, "referralCodes", referralCode), {
+            uid: user.uid,
+            createdAt: serverTimestamp()
+        });
+
         regSection.classList.add("hidden");
         showDashboard(affiliateData);
     } catch (error) {

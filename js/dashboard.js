@@ -388,12 +388,12 @@ async function handleDevelopmentUpgrade(uid, planType) {
         const userData = userDoc.data();
         const referredBy = userData.referredBy;
 
-        let affiliateDoc = null;
+        let affiliateUid = null;
         if (referredBy) {
-            const affQ = query(collection(db, "affiliates"), where("referralCode", "==", referredBy), limit(1));
-            const affSnap = await getDocs(affQ);
-            if (!affSnap.empty) {
-                affiliateDoc = affSnap.docs[0];
+            const codeRef = doc(db, "referralCodes", referredBy);
+            const codeSnap = await getDoc(codeRef);
+            if (codeSnap.exists()) {
+                affiliateUid = codeSnap.data().uid;
             }
         }
 
@@ -424,8 +424,7 @@ async function handleDevelopmentUpgrade(uid, planType) {
             });
 
             // Handle Commission and Referrals if applicable
-            if (affiliateDoc && !hasCommission) {
-                const affiliateUid = affiliateDoc.id;
+            if (affiliateUid && !hasCommission) {
                 const affiliateRef = doc(db, "affiliates", affiliateUid);
                 const currentAffSnap = await transaction.get(affiliateRef);
                 const currentAffData = currentAffSnap.data();

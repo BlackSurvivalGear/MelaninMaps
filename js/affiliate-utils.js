@@ -22,18 +22,17 @@ export function generateReferralCode(name) {
  * @param {string} code - The referral code to check
  * @returns {Promise<string|null>} - Returns affiliateId if found, else null
  */
-import { collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 export async function validateReferralCode(db, code) {
     if (!code) return null;
 
     try {
-        const affiliatesRef = collection(db, "affiliates");
-        const q = query(affiliatesRef, where("referralCode", "==", code.toUpperCase().trim()), limit(1));
-        const querySnapshot = await getDocs(q);
+        const docRef = doc(db, "referralCodes", code.toUpperCase().trim());
+        const docSnap = await getDoc(docRef);
 
-        if (!querySnapshot.empty) {
-            return querySnapshot.docs[0].data().affiliateId;
+        if (docSnap.exists()) {
+            return docSnap.data().uid;
         }
         return null;
     } catch (error) {

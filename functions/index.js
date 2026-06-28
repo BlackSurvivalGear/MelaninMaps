@@ -97,14 +97,82 @@ exports.verifyPayPalPayment = onCall({ secrets: [PAYPAL_CLIENT_ID, PAYPAL_CLIENT
 });
 
 async function updateSubscription(uid, plan, transactionId) {
-    const userRef = admin.firestore().collection("users").doc(uid);
-    await userRef.update({
-        plan: plan,
-        subscriptionStatus: "active",
-        subscriptionActivatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        paymentMethod: "paypal",
-        paypalTransactionId: transactionId,
-        upgradedBy: "paypal"
+    const db = admin.firestore();
+    const userRef = db.collection("users").doc(uid);
+
+    await db.runTransaction(async (transaction) => {
+        const userSnap = await transaction.get(userRef);
+        if (!userSnap.exists) return;
+
+        const userData = userSnap.data();
+        const currentPlan = userData.plan || "preview";
+
+        // Skip if already upgraded to this plan or better
+        if (currentPlan === plan || (currentPlan === "pro" && plan === "standard")) return;
+
+        const referredBy = userData.referredBy;
+        const commissionAlreadyGenerated = userData.commissionGenerated === true;
+
+        // Update user
+        transaction.update(userRef, {
+            plan: plan,
+            subscriptionStatus: "active",
+            subscriptionActivatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            paymentMethod: "paypal",
+            paypalTransactionId: transactionId,
+            upgradedBy: "paypal",
+            commissionGenerated: true
+        });
+
+        // Handle Affiliate Commission
+        if (referredBy && !commissionAlreadyGenerated) {
+            const codeRef = db.collection("referralCodes").doc(referredBy);
+            const codeSnap = await transaction.get(codeRef);
+
+            if (codeSnap.exists) {
+                const affiliateUid = codeSnap.data().uid;
+                const affiliateRef = db.collection("affiliates").doc(affiliateUid);
+                const affSnap = await transaction.get(affiliateRef);
+
+                if (affSnap.exists) {
+                    const bizRef = db.collection("businesses").doc(uid);
+                    const bizSnap = await transaction.get(bizRef);
+                    const businessName = bizSnap.exists ? bizSnap.data().businessName : "Unknown Business";
+
+                    const amountPaid = plan === "pro" ? 49.99 : 9.99;
+                    const commissionAmount = plan === "pro" ? 15.00 : 3.00;
+
+                    // Create Commission Doc
+                    const commissionRef = db.collection("commissions").doc();
+                    transaction.set(commissionRef, {
+                        affiliateId: affiliateUid,
+                        businessId: uid,
+                        businessName: businessName,
+                        subscription: plan.charAt(0).toUpperCase() + plan.slice(1),
+                        amountPaid: amountPaid,
+                        commission: commissionAmount,
+                        status: "Pending",
+                        source: "paypal-webhook",
+                        createdAt: admin.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // Update Affiliate Totals
+                    const affData = affSnap.data();
+                    transaction.update(affiliateRef, {
+                        pendingCommission: (affData.pendingCommission || 0) + commissionAmount,
+                        totalBusinesses: (affData.totalBusinesses || 0) + 1,
+                        lifetimeCommission: (affData.lifetimeCommission || 0) + commissionAmount
+                    });
+
+                    // Update Referral Record
+                    const referralRef = db.collection("referrals").doc(`${affiliateUid}_${uid}`);
+                    transaction.update(referralRef, {
+                        subscription: plan.charAt(0).toUpperCase() + plan.slice(1),
+                        status: "Paid"
+                    });
+                }
+            }
+        }
     });
 }
 
