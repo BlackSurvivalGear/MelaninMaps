@@ -10,6 +10,7 @@ const generateBtn = document.getElementById("generate-qr-btn");
 const openMenuBtn = document.getElementById("open-menu-btn");
 const downloadBtn = document.getElementById("download-qr-btn");
 const copyLinkBtn = document.getElementById("copy-link-btn");
+const downloadSvgBtn = document.getElementById("download-qr-svg-btn");
 const qrPreviewContainer = document.getElementById("qr-preview-container");
 const qrDownloadActions = document.getElementById("qr-download-actions");
 const qrMessage = document.getElementById("qr-message");
@@ -19,6 +20,29 @@ let currentUid = null;
 let currentBizName = "restaurant";
 let publicMenuUrl = "";
 let currentLogoUrl = "";
+let currentSvgData = "";
+
+/**
+ * Helper: Load an image and convert to Base64 Data URL
+ * @param {string} src
+ * @returns {Promise<string|null>}
+ */
+async function getBase64FromUrl(src) {
+    try {
+        const response = await fetch(src);
+        if (!response.ok) return null;
+        const blob = await response.blob();
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+        });
+    } catch (e) {
+        console.warn("Failed to load logo for QR branding:", e);
+        return null;
+    }
+}
 
 /**
  * Initialize the QR Manager
@@ -49,6 +73,10 @@ export function initQRManager(uid, businessName, logoUrl = "") {
         downloadBtn.addEventListener("click", handleDownloadPNG);
     }
 
+    if (downloadSvgBtn) {
+        downloadSvgBtn.addEventListener("click", handleDownloadSVG);
+    }
+
     if (copyLinkBtn) {
         copyLinkBtn.addEventListener("click", handleCopyLink);
     }
@@ -57,7 +85,7 @@ export function initQRManager(uid, businessName, logoUrl = "") {
 /**
  * Handle QR Code Generation
  */
-function handleGenerateQR() {
+async function handleGenerateQR() {
     try {
         hideFeedback();
 
@@ -67,35 +95,76 @@ function handleGenerateQR() {
         qr.make();
 
         // Create Canvas for better control and download
-        const cellSize = 8;
+        const canvasSize = 300;
         const margin = 20;
-        const qrSize = qr.getModuleCount();
+        const qrModules = qr.getModuleCount();
 
         const canvas = document.createElement('canvas');
-        canvas.width = 300; // Force 300x300 as per requirements
-        canvas.height = 300;
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
         const ctx = canvas.getContext('2d');
 
         // Fill background
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw QR code scaled to fit 300x300 with margin
-        const scale = (300 - margin * 2) / (qrSize * cellSize);
+        // Draw QR code
+        const innerSize = canvasSize - (margin * 2);
+        const cellSize = innerSize / qrModules;
 
-        ctx.save();
-        ctx.translate(margin, margin);
-        ctx.scale(scale * cellSize, scale * cellSize);
-
-        for (let row = 0; row < qrSize; row++) {
-            for (let col = 0; col < qrSize; col++) {
+        for (let row = 0; row < qrModules; row++) {
+            for (let col = 0; col < qrModules; col++) {
                 if (qr.isDark(row, col)) {
                     ctx.fillStyle = "black";
-                    ctx.fillRect(col, row, 1, 1);
+                    ctx.fillRect(
+                        margin + (col * cellSize),
+                        margin + (row * cellSize),
+                        Math.ceil(cellSize),
+                        Math.ceil(cellSize)
+                    );
                 }
             }
         }
-        ctx.restore();
+
+        // Add Centered Branding Logo
+        const faviconDataUrl = await getBase64FromUrl('/favicon.png');
+
+        if (faviconDataUrl) {
+            const logo = new Image();
+            await new Promise((resolve) => {
+                logo.onload = resolve;
+                logo.src = faviconDataUrl;
+            });
+
+            const logoSize = canvasSize * 0.20; // 20% of width
+            const logoPos = (canvasSize - logoSize) / 2;
+            const logoMargin = 6; // 6px white margin
+
+            // Draw white rounded-square background
+            ctx.fillStyle = "white";
+            const bgPos = logoPos - logoMargin;
+            const bgSize = logoSize + (logoMargin * 2);
+            const radius = 8;
+
+            ctx.beginPath();
+            ctx.moveTo(bgPos + radius, bgPos);
+            ctx.lineTo(bgPos + bgSize - radius, bgPos);
+            ctx.quadraticCurveTo(bgPos + bgSize, bgPos, bgPos + bgSize, bgPos + radius);
+            ctx.lineTo(bgPos + bgSize, bgPos + bgSize - radius);
+            ctx.quadraticCurveTo(bgPos + bgSize, bgPos + bgSize, bgPos + bgSize - radius, bgPos + bgSize);
+            ctx.lineTo(bgPos + radius, bgPos + bgSize);
+            ctx.quadraticCurveTo(bgPos, bgPos + bgSize, bgPos, bgPos + bgSize - radius);
+            ctx.lineTo(bgPos, bgPos + radius);
+            ctx.quadraticCurveTo(bgPos, bgPos, bgPos + radius, bgPos);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw logo
+            ctx.drawImage(logo, logoPos, logoPos, logoSize, logoSize);
+        }
+
+        // Generate Branded SVG
+        currentSvgData = generateBrandedSVG(qr, faviconDataUrl, canvasSize, margin);
 
         // Update UI - Reorder branding elements
         qrPreviewContainer.innerHTML = "";
@@ -153,6 +222,48 @@ function handleGenerateQR() {
 }
 
 /**
+ * Generate Branded SVG String
+ */
+function generateBrandedSVG(qr, logoDataUrl, size, margin) {
+    const modules = qr.getModuleCount();
+    const cellSize = (size - (margin * 2)) / modules;
+
+    let paths = "";
+    for (let row = 0; row < modules; row++) {
+        for (let col = 0; col < modules; col++) {
+            if (qr.isDark(row, col)) {
+                const x = margin + (col * cellSize);
+                const y = margin + (row * cellSize);
+                paths += `M${x},${y}h${cellSize}v${cellSize}h-${cellSize}z `;
+            }
+        }
+    }
+
+    let branding = "";
+    if (logoDataUrl) {
+        const logoSize = size * 0.20;
+        const logoPos = (size - logoSize) / 2;
+        const logoMargin = 6;
+        const bgPos = logoPos - logoMargin;
+        const bgSize = logoSize + (logoMargin * 2);
+        const radius = 8;
+
+        branding = `
+            <rect x="${bgPos}" y="${bgPos}" width="${bgSize}" height="${bgSize}" rx="${radius}" fill="white" />
+            <image href="${logoDataUrl}" x="${logoPos}" y="${logoPos}" width="${logoSize}" height="${logoSize}" />
+        `;
+    }
+
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+            <rect width="100%" height="100%" fill="white" />
+            <path d="${paths}" fill="black" />
+            ${branding}
+        </svg>
+    `.trim();
+}
+
+/**
  * Handle Open Menu
  */
 function handleOpenMenu() {
@@ -186,6 +297,39 @@ function handleDownloadPNG() {
         link.download = filename;
         link.href = canvas.toDataURL("image/png");
         link.click();
+    } catch (error) {
+        console.error("Download Error:", error);
+        showError("Download failure. Please try again.");
+    }
+}
+
+/**
+ * Handle SVG Download
+ */
+function handleDownloadSVG() {
+    try {
+        if (!currentSvgData) {
+            showError("Please generate a QR code first.");
+            return;
+        }
+
+        const sanitizedName = currentBizName
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+
+        const filename = `${sanitizedName || 'restaurant'}-qr.svg`;
+
+        const blob = new Blob([currentSvgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.download = filename;
+        link.href = url;
+        link.click();
+
+        URL.revokeObjectURL(url);
     } catch (error) {
         console.error("Download Error:", error);
         showError("Download failure. Please try again.");
