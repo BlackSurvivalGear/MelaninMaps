@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#000000">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard | MelaninMaps™</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="apple-touch-icon" href="../favicon.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .leaderboard-rank {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        .rank-top-1 {
+            color: #FFD700; /* Gold */
+            font-size: 1.5rem;
+        }
+        .rank-top-2 {
+            color: #C0C0C0; /* Silver */
+        }
+        .rank-top-3 {
+            color: #CD7F32; /* Bronze */
+        }
+    </style>
+</head>
+<body class="melaninmaps-theme">
+    <header>
+        <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <a href="../index.html" class="logo">
+                <img src="../logo-mm.png" alt="MelaninMaps™" class="logo-icon">
+                <span>Partner Portal</span>
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="marketing.html">Marketing</a>
+                <a href="leaderboard.html" class="active">Leaderboard</a>
+                <a href="profile.html">Profile</a>
+                <button id="logout-btn" class="btn btn-outline btn-small">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="welcome-card">
+            <h2 class="cinzel-text">Partner Leaderboard</h2>
+            <p>See how you rank against the top MelaninMaps™ partners worldwide.</p>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Partner</th>
+                        <th>Businesses Referred</th>
+                        <th>Pro Conversions</th>
+                        <th>Commission Earned</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <tr><td colspan="5" style="text-align: center;">Loading leaderboard...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script type="module" src="../js/mobile-menu.js"></script>
+    <script type="module" src="../js/partners/leaderboard.js"></script>
+</body>
+</html>

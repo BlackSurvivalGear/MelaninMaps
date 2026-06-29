@@ -57,6 +57,8 @@
                 <button class="tab-btn active" data-tab="users-panel">Users</button>
                 <button class="tab-btn" data-tab="restaurants-panel">Restaurants</button>
                 <button class="tab-btn" data-tab="partners-panel">Partners</button>
+                <button class="tab-btn" data-tab="payouts-panel">Payouts</button>
+                <button class="tab-btn" data-tab="announcements-panel">Announcements</button>
                 <button class="tab-btn" data-tab="diagnostic-panel">Map Diagnostics</button>
             </div>
 
@@ -153,16 +155,57 @@
                                 <th>Partner Name</th>
                                 <th>Referral Code</th>
                                 <th>Businesses</th>
+                                <th>Status</th>
                                 <th>Pending</th>
-                                <th>Paid</th>
-                                <th>Lifetime</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="partners-table-body">
-                            <tr><td colspan="7" style="text-align: center;">Loading partners...</td></tr>
+                            <tr><td colspan="6" style="text-align: center;">Loading partners...</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </section>
+
+            <!-- Payouts Panel -->
+            <section id="payouts-panel" class="admin-section tab-content hidden">
+                <div class="section-header">
+                    <h3>Commission Payouts</h3>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Partner</th>
+                                <th>Payment Details</th>
+                                <th>Pending Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payouts-table-body">
+                            <tr><td colspan="4" style="text-align: center;">Loading payouts...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Announcements Panel -->
+            <section id="announcements-panel" class="admin-section tab-content hidden">
+                <div class="section-header">
+                    <h3>Broadcast Announcements</h3>
+                </div>
+                <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+                    <form id="announcement-form">
+                        <div class="form-group">
+                            <label for="announcement-title">Subject</label>
+                            <input type="text" id="announcement-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="announcement-body">Message</label>
+                            <textarea id="announcement-body" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Send to All Partners</button>
+                    </form>
                 </div>
             </section>
 

@@ -96,6 +96,49 @@ async function init() {
     document.getElementById('export-restaurants-btn').addEventListener('click', exportRestaurantsCSV);
     document.getElementById('export-partners-btn').addEventListener('click', exportPartnersCSV);
 
+    // Announcement Broadcast
+    const announcementForm = document.getElementById('announcement-form');
+    if (announcementForm) {
+        announcementForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('announcement-title').value;
+            const body = document.getElementById('announcement-body').value;
+
+            if (confirm(`Broadcast this announcement to all partners?`)) {
+                try {
+                    const partnersSnap = await getDocs(collection(db, "partners"));
+                    const partnerDocs = partnersSnap.docs;
+
+                    // Process in chunks of 500 for Firestore batch limit
+                    const chunkSize = 500;
+                    for (let i = 0; i < partnerDocs.length; i += chunkSize) {
+                        const batch = writeBatch(db);
+                        const chunk = partnerDocs.slice(i, i + chunkSize);
+
+                        chunk.forEach(pDoc => {
+                            const notifRef = doc(collection(db, `partners/${pDoc.id}/notifications`));
+                            batch.set(notifRef, {
+                                title,
+                                body,
+                                type: 'announcement',
+                                read: false,
+                                createdAt: serverTimestamp()
+                            });
+                        });
+
+                        await batch.commit();
+                    }
+
+                    alert(`Announcement broadcasted to ${partnerDocs.length} partners!`);
+                    announcementForm.reset();
+                } catch (error) {
+                    console.error("Error broadcasting:", error);
+                    alert("Failed to broadcast.");
+                }
+            }
+        });
+    }
+
     // Modal close listeners
     document.getElementById('close-subscription-modal').addEventListener('click', hideSubscriptionModal);
     document.getElementById('cancel-subscription-btn').addEventListener('click', hideSubscriptionModal);
@@ -249,6 +292,44 @@ document.getElementById('confirm-subscription-btn').addEventListener('click', as
         };
 
         await updateDoc(userRef, updateData);
+
+        // Update partner referral status if Pro
+        if (newPlan === 'pro') {
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists() && userSnap.data().referredBy) {
+                const refCode = userSnap.data().referredBy;
+                const codeSnap = await getDoc(doc(db, "referralCodes", refCode));
+                if (codeSnap.exists() && codeSnap.data().type === 'partner') {
+                    const partnerId = codeSnap.data().uid;
+                    const referralRef = doc(db, "partnerReferrals", `${partnerId}_${uid}`);
+
+                    // Simple fixed commission for Pro upgrade for now
+                    const commissionAmount = 25.00;
+
+                    await updateDoc(referralRef, {
+                        status: "Upgraded to Pro",
+                        plan: "Pro",
+                        commission: commissionAmount
+                    });
+
+                    // Update Partner Stats
+                    await updateDoc(doc(db, "partners", partnerId), {
+                        totalProBusinesses: increment(1),
+                        pendingCommission: increment(commissionAmount),
+                        commissionEarned: increment(commissionAmount)
+                    });
+
+                    // Notification
+                    await setDoc(doc(collection(db, `partners/${partnerId}/notifications`)), {
+                        title: "Referral Upgraded to Pro!",
+                        body: `A referral has upgraded to Pro. You earned £${commissionAmount.toFixed(2)} commission!`,
+                        type: "pro_upgrade",
+                        read: false,
+                        createdAt: serverTimestamp()
+                    });
+                }
+            }
+        }
 
         hideSubscriptionModal();
         alert("Subscription updated successfully!");
@@ -546,6 +627,33 @@ function renderBusinessesTable(businesses) {
                         status: "verified",
                         updatedAt: serverTimestamp()
                     });
+
+                    // Update partner referral status if applicable
+                    const userSnap = await getDoc(doc(db, "users", uid));
+                    if (userSnap.exists() && userSnap.data().referredBy) {
+                        const refCode = userSnap.data().referredBy;
+                        const codeSnap = await getDoc(doc(db, "referralCodes", refCode));
+                        if (codeSnap.exists() && codeSnap.data().type === 'partner') {
+                            const partnerId = codeSnap.data().uid;
+                            const referralRef = doc(db, "partnerReferrals", `${partnerId}_${uid}`);
+                            await updateDoc(referralRef, { status: "Published" });
+
+                            // Increment totalPublished on partner doc
+                            await updateDoc(doc(db, "partners", partnerId), {
+                                totalPublished: increment(1)
+                            });
+
+                            // Notification
+                            await setDoc(doc(collection(db, `partners/${partnerId}/notifications`)), {
+                                title: "Referral Published!",
+                                body: `The business profile for a referral has been verified and published.`,
+                                type: "published",
+                                read: false,
+                                createdAt: serverTimestamp()
+                            });
+                        }
+                    }
+
                     loadBusinesses();
                 } catch (error) {
                     console.error("Error verifying business:", error);
@@ -625,10 +733,10 @@ function renderBusinessesTable(businesses) {
 async function loadPartners(searchTerm = "") {
     const tableBody = document.getElementById('partners-table-body');
     if (!tableBody) return;
-    tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading partners...</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Loading partners...</td></tr>';
 
     try {
-        const q = query(collection(db, "affiliates"), orderBy("createdAt", "desc"));
+        const q = query(collection(db, "partners"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
 
         let partners = [];
@@ -636,13 +744,12 @@ async function loadPartners(searchTerm = "") {
             const data = doc.data();
             partners.push({
                 uid: doc.id,
-                name: data.name || "N/A",
+                name: data.fullName || "N/A",
                 email: data.email || "N/A",
                 referralCode: data.referralCode || "N/A",
                 totalBusinesses: data.totalBusinesses || 0,
                 pendingCommission: data.pendingCommission || 0,
-                paidCommission: data.paidCommission || 0,
-                lifetimeCommission: data.lifetimeCommission || 0,
+                status: data.status || 'active',
                 createdAt: data.createdAt ? data.createdAt.toDate() : new Date()
             });
         });
@@ -657,9 +764,10 @@ async function loadPartners(searchTerm = "") {
 
         partnersData = partners;
         renderPartnersTable(partners);
+        renderPayoutsTable(partners);
     } catch (error) {
         console.error("Error loading partners:", error);
-        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Error loading partners.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error loading partners.</td></tr>';
     }
 }
 
@@ -668,7 +776,7 @@ function renderPartnersTable(partners) {
     tableBody.innerHTML = '';
 
     if (partners.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No partners found.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No partners found.</td></tr>';
         return;
     }
 
@@ -678,89 +786,90 @@ function renderPartnersTable(partners) {
             <td><strong>${partner.name}</strong><br><small>${partner.email}</small></td>
             <td><code>${partner.referralCode}</code></td>
             <td>${partner.totalBusinesses}</td>
+            <td><span class="badge ${partner.status === 'active' ? 'badge-available' : 'badge-preview'}">${partner.status}</span></td>
             <td>£${partner.pendingCommission.toFixed(2)}</td>
-            <td>£${partner.paidCommission.toFixed(2)}</td>
-            <td>£${partner.lifetimeCommission.toFixed(2)}</td>
             <td>
                 <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn btn-primary btn-small mark-paid-btn" data-uid="${partner.uid}">Mark Paid</button>
-                    <button class="btn btn-outline btn-small view-commissions-btn" data-uid="${partner.uid}">Details</button>
+                    <button class="btn btn-outline btn-small toggle-partner-btn" data-uid="${partner.uid}" data-status="${partner.status}">
+                        ${partner.status === 'active' ? 'Suspend' : 'Activate'}
+                    </button>
+                    <button class="btn btn-error btn-small delete-partner-btn" data-uid="${partner.uid}">Delete</button>
                 </div>
             </td>
         `;
         tableBody.appendChild(tr);
     });
 
-    // Mark Paid Event
-    document.querySelectorAll('.mark-paid-btn').forEach(btn => {
+    // Toggle Status
+    document.querySelectorAll('.toggle-partner-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const uid = btn.getAttribute('data-uid');
-            const partner = partners.find(p => p.uid === uid);
+            const currentStatus = btn.getAttribute('data-status');
+            const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
 
-            if (partner.pendingCommission <= 0) {
-                alert("No pending commission to pay.");
-                return;
-            }
-
-            if (confirm(`Mark £${partner.pendingCommission.toFixed(2)} as paid for ${partner.name}?`)) {
-                try {
-                    // Fetch pending commissions OUTSIDE the transaction
-                    const commsQ = query(
-                        collection(db, "commissions"),
-                        where("affiliateId", "==", uid),
-                        where("status", "==", "Pending")
-                    );
-                    const commsSnap = await getDocs(commsQ);
-
-                    if (commsSnap.empty) {
-                        alert("No pending commission documents found.");
-                        return;
-                    }
-
-                    await runTransaction(db, async (transaction) => {
-                        const affRef = doc(db, "affiliates", uid);
-                        const affSnap = await transaction.get(affRef);
-                        const affData = affSnap.data();
-
-                        let totalToPay = 0;
-                        commsSnap.forEach(cDoc => {
-                            totalToPay += (cDoc.data().commission || 0);
-                        });
-
-                        const currentPending = affData.pendingCommission || 0;
-                        const currentPaid = affData.paidCommission || 0;
-
-                        // Atomic update: subtract exactly what we found in the documents
-                        transaction.update(affRef, {
-                            pendingCommission: Math.max(0, currentPending - totalToPay),
-                            paidCommission: currentPaid + totalToPay,
-                            updatedAt: serverTimestamp()
-                        });
-
-                        // Update each commission record
-                        commsSnap.forEach(cDoc => {
-                            transaction.update(doc(db, "commissions", cDoc.id), {
-                                status: "Paid",
-                                paidDate: serverTimestamp()
-                            });
-                        });
-                    });
-                    alert(`✓ £${partner.pendingCommission.toFixed(2)} marked as paid.`);
-                    loadPartners();
-                    loadStats();
-                } catch (error) {
-                    console.error("Error marking paid:", error);
-                    alert("Failed to update: " + error);
-                }
+            if (confirm(`Change status to ${newStatus}?`)) {
+                await updateDoc(doc(db, "partners", uid), { status: newStatus });
+                loadPartners();
             }
         });
     });
+}
 
-    document.querySelectorAll('.view-commissions-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+function renderPayoutsTable(partners) {
+    const tableBody = document.getElementById('payouts-table-body');
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+
+    const eligible = partners.filter(p => p.pendingCommission > 0);
+
+    if (eligible.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No pending payouts.</td></tr>';
+        return;
+    }
+
+    eligible.forEach(partner => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${partner.name}</strong></td>
+            <td><small>${partner.email}</small></td>
+            <td>£${partner.pendingCommission.toFixed(2)}</td>
+            <td>
+                <button class="btn btn-primary btn-small process-payout-btn" data-uid="${partner.uid}" data-amount="${partner.pendingCommission}">
+                    Process Payout
+                </button>
+            </td>
+        `;
+        tableBody.appendChild(tr);
+    });
+
+    document.querySelectorAll('.process-payout-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
             const uid = btn.getAttribute('data-uid');
-            const p = partners.find(part => part.uid === uid);
-            alert(`Partner: ${p.name}\nEmail: ${p.email}\nCode: ${p.referralCode}\nBusinesses: ${p.totalBusinesses}\nLifetime: £${p.lifetimeCommission.toFixed(2)}`);
+            const amount = parseFloat(btn.getAttribute('data-amount'));
+
+            if (confirm(`Mark £${amount.toFixed(2)} as paid?`)) {
+                const partnerRef = doc(db, "partners", uid);
+                const partnerSnap = await getDoc(partnerRef);
+                const data = partnerSnap.data();
+
+                await updateDoc(partnerRef, {
+                    pendingCommission: 0,
+                    paidCommission: (data.paidCommission || 0) + amount,
+                    updatedAt: serverTimestamp()
+                });
+
+                // Add to commissions history for partner
+                const commRef = doc(collection(db, "commissions"));
+                await setDoc(commRef, {
+                    partnerId: uid,
+                    amount: amount,
+                    status: 'Paid',
+                    createdAt: serverTimestamp()
+                });
+
+                alert('Payout processed!');
+                loadPartners();
+            }
         });
     });
 }

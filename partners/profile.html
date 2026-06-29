@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#000000">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Profile | MelaninMaps™</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="apple-touch-icon" href="../favicon.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="melaninmaps-theme">
+    <header>
+        <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <a href="../index.html" class="logo">
+                <img src="../logo-mm.png" alt="MelaninMaps™" class="logo-icon">
+                <span>Partner Portal</span>
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="marketing.html">Marketing</a>
+                <a href="leaderboard.html">Leaderboard</a>
+                <a href="profile.html" class="active">Profile</a>
+                <button id="logout-btn" class="btn btn-outline btn-small">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="auth-card" style="max-width: 800px; margin: 2rem auto;">
+            <h2 class="cinzel-text">Your Partner Profile</h2>
+            <p>Manage your account details and payment information.</p>
+
+            <form id="partner-profile-form" style="margin-top: 2rem;">
+                <div class="form-section">
+                    <h3 class="cinzel-text" style="font-size: 1.1rem; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Basic Information</h3>
+                    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" readonly style="opacity: 0.7;">
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile">Mobile Number</label>
+                            <input type="tel" id="mobile" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <input type="text" id="country" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section" style="margin-top: 3rem;">
+                    <h3 class="cinzel-text" style="font-size: 1.1rem; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Payment Details</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">How would you like to receive your commissions?</p>
+                    <div class="form-group">
+                        <label for="paymentDetails">Payment Instructions (e.g., PayPal Email or Bank Details)</label>
+                        <textarea id="paymentDetails" rows="3" placeholder="Enter your PayPal email or bank transfer details..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section" style="margin-top: 3rem;">
+                    <h3 class="cinzel-text" style="font-size: 1.1rem; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Social Links</h3>
+                    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label for="instagram">Instagram</label>
+                            <input type="text" id="instagram" placeholder="@username">
+                        </div>
+                        <div class="form-group">
+                            <label for="twitter">Twitter / X</label>
+                            <input type="text" id="twitter" placeholder="@username">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem; display: flex; justify-content: flex-end;">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script type="module" src="../js/mobile-menu.js"></script>
+    <script type="module" src="../js/partners/profile.js"></script>
+</body>
+</html>

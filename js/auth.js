@@ -59,8 +59,11 @@ if (refCode) {
             const codeRef = doc(db, "referralCodes", cleanCode);
             const codeSnap = await getDoc(codeRef);
             if (codeSnap.exists()) {
-                const affiliateUid = codeSnap.data().uid;
-                await updateDoc(doc(db, "affiliates", affiliateUid), {
+                const uid = codeSnap.data().uid;
+                const type = codeSnap.data().type || 'affiliate';
+                const collectionName = type === 'partner' ? 'partners' : 'affiliates';
+
+                await updateDoc(doc(db, collectionName, uid), {
                     totalClicks: increment(1)
                 });
             }
@@ -176,14 +179,43 @@ if (authForm) {
                         const codeSnap = await getDoc(codeRef);
                         if (codeSnap.exists()) {
                             const affiliateId = codeSnap.data().uid;
-                            await setDoc(doc(db, "referrals", `${affiliateId}_${user.uid}`), {
-                                affiliateId: affiliateId,
-                                businessId: user.uid,
-                                businessName: "Pending Profile", // Will be updated when profile is created
-                                joinedAt: serverTimestamp(),
-                                subscription: "Preview",
-                                status: "Pending"
-                            });
+                            const referralType = codeSnap.data().type || 'affiliate';
+
+                            if (referralType === 'partner') {
+                                // New Partner Portal Tracking
+                                await setDoc(doc(db, "partnerReferrals", `${affiliateId}_${user.uid}`), {
+                                    partnerId: affiliateId,
+                                    businessId: user.uid,
+                                    businessName: "Pending Profile",
+                                    status: "Registered",
+                                    plan: "Preview",
+                                    commission: 0,
+                                    createdAt: serverTimestamp()
+                                });
+
+                                // Increment totalBusinesses on partner doc
+                                await updateDoc(doc(db, "partners", affiliateId), {
+                                    totalBusinesses: increment(1)
+                                });
+
+                                // Add notification for partner
+                                await setDoc(doc(collection(db, `partners/${affiliateId}/notifications`)), {
+                                    title: "New Referral Registered",
+                                    body: `A new business has registered using your link.`,
+                                    type: "registration",
+                                    read: false,
+                                    createdAt: serverTimestamp()
+                                });
+                            } else {
+                                await setDoc(doc(db, "referrals", `${affiliateId}_${user.uid}`), {
+                                    affiliateId: affiliateId,
+                                    businessId: user.uid,
+                                    businessName: "Pending Profile", // Will be updated when profile is created
+                                    joinedAt: serverTimestamp(),
+                                    subscription: "Preview",
+                                    status: "Pending"
+                                });
+                            }
                         }
                     } catch (e) {
                         console.error("Error creating referral doc:", e);

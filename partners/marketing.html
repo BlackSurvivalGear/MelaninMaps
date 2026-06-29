@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#000000">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Centre | MelaninMaps™</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="apple-touch-icon" href="../favicon.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .marketing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .marketing-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(212,175,55,0.1);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .marketing-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+        .marketing-preview {
+            height: 200px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        .marketing-info {
+            padding: 1.5rem;
+        }
+        .marketing-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .marketing-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="melaninmaps-theme">
+    <header>
+        <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <a href="../index.html" class="logo">
+                <img src="../logo-mm.png" alt="MelaninMaps™" class="logo-icon">
+                <span>Partner Portal</span>
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="marketing.html" class="active">Marketing</a>
+                <a href="leaderboard.html">Leaderboard</a>
+                <a href="profile.html">Profile</a>
+                <button id="logout-btn" class="btn btn-outline btn-small">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="welcome-card">
+            <h2 class="cinzel-text">Marketing Centre</h2>
+            <p>Download professional promotional materials to help you recruit businesses.</p>
+        </div>
+
+        <div class="marketing-grid">
+            <div class="marketing-card">
+                <div class="marketing-preview">📄</div>
+                <div class="marketing-info">
+                    <h3>Posters & Flyers</h3>
+                    <p>High-quality PDF and PNG posters for physical distribution.</p>
+                    <button class="btn btn-primary btn-small btn-full">Download Pack</button>
+                </div>
+            </div>
+            <div class="marketing-card">
+                <div class="marketing-preview">📱</div>
+                <div class="marketing-info">
+                    <h3>Social Media Graphics</h3>
+                    <p>Optimized images for Instagram, Facebook, and Twitter.</p>
+                    <button class="btn btn-primary btn-small btn-full">Download Pack</button>
+                </div>
+            </div>
+            <div class="marketing-card">
+                <div class="marketing-preview">💬</div>
+                <div class="marketing-info">
+                    <h3>WhatsApp Images</h3>
+                    <p>Square graphics perfect for WhatsApp status and chats.</p>
+                    <button class="btn btn-primary btn-small btn-full">Download Pack</button>
+                </div>
+            </div>
+            <div class="marketing-card">
+                <div class="marketing-preview">📧</div>
+                <div class="marketing-info">
+                    <h3>Email Templates</h3>
+                    <p>Copy-paste templates for professional business outreach.</p>
+                    <button class="btn btn-primary btn-small btn-full">View Templates</button>
+                </div>
+            </div>
+            <div class="marketing-card">
+                <div class="marketing-preview">🎴</div>
+                <div class="marketing-info">
+                    <h3>Business Cards</h3>
+                    <p>Printable business card designs with space for your QR code.</p>
+                    <button class="btn btn-primary btn-small btn-full">Download Designs</button>
+                </div>
+            </div>
+            <div class="marketing-card">
+                <div class="marketing-preview">✨</div>
+                <div class="marketing-info">
+                    <h3>Logos & Branding</h3>
+                    <p>Official MelaninMaps™ logos and brand guidelines.</p>
+                    <button class="btn btn-primary btn-small btn-full">Download Assets</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="../js/mobile-menu.js"></script>
+    <script type="module" src="../js/partners/auth.js"></script>
+</body>
+</html>
