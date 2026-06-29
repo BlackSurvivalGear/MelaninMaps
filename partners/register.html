@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="theme-color" content="#000000">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Registration | MelaninMaps™</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="apple-touch-icon" href="../favicon.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="melaninmaps-theme">
+    <header>
+        <nav class="container">
+            <button id="mobile-menu-toggle" class="mobile-only" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <a href="../index.html" class="logo">
+                <img src="../logo-mm.png" alt="MelaninMaps™" class="logo-icon">
+                <span>Partner Portal</span>
+            </a>
+            <div class="nav-links">
+                <a href="../melanin-map.html" class="btn btn-outline btn-small">MelaninMaps</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="auth-container" style="max-width: 600px; margin-top: 2rem; margin-bottom: 4rem;">
+        <div class="auth-card">
+            <h2 class="cinzel-text">Join the Partner Program</h2>
+            <p>Grow MelaninMaps™ by recruiting businesses and earn commissions.</p>
+
+            <form id="partner-register-form">
+                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" required placeholder="john@example.com">
+                    </div>
+                </div>
+
+                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required placeholder="••••••••">
+                        <small>At least 6 characters</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile Number</label>
+                        <input type="tel" id="mobile" required placeholder="+1 234 567 890">
+                    </div>
+                </div>
+
+                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <input type="text" id="country" required placeholder="United Kingdom">
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" required placeholder="London">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="referralName">Referral/Promo Name (Optional)</label>
+                    <input type="text" id="referralName" placeholder="How did you hear about us?">
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-full" style="margin-top: 1rem;">
+                    <span id="btn-text">Apply to Become a Partner</span>
+                    <div id="btn-loader" class="loader hidden"></div>
+                </button>
+            </form>
+
+            <div id="error-message" class="error-box hidden" style="margin-top: 1rem;"></div>
+
+            <div class="auth-switch">
+                <p>Already have a partner account? <a href="login.html">Sign In</a></p>
+            </div>
+
+            <div class="back-home">
+                <a href="../index.html">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/partners/auth.js"></script>
+    <script type="module" src="../js/mobile-menu.js"></script>
+</body>
+</html>

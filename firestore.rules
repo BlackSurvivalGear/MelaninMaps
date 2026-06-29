@@ -76,17 +76,34 @@ service cloud.firestore {
       allow delete: if (request.auth != null && resource.data.restaurantId == request.auth.uid) || isModerator();
     }
 
-    // Affiliate rules
-    match /affiliates/{uid} {
-      // Partner can read their own affiliate document. Admin has full access.
+    // Partner rules
+    match /partners/{uid} {
       allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
-
-      // Partner can create their own affiliate document.
       allow create: if request.auth != null && request.auth.uid == uid;
+      allow update: if isAdmin()
+                    || (request.auth != null && request.auth.uid == uid &&
+                        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['partnerId', 'commissionEarned', 'pendingCommission', 'paidCommission', 'totalBusinesses', 'totalProBusinesses']));
+      allow delete: if isAdmin();
 
-      // Partner can update only safe profile fields.
-      // Admin has full access to update all fields including earnings.
-      // Public increment of totalClicks.
+      // Notifications subcollection for partners
+      match /notifications/{notifId} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow write: if isAdmin();
+      }
+    }
+
+    // Partner Referral rules
+    match /partnerReferrals/{referralId} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.partnerId == request.auth.uid);
+      allow create: if request.auth != null;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Affiliate rules (legacy - keep for compatibility if needed, but transitioning to /partners)
+    match /affiliates/{uid} {
+      allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+      allow create: if request.auth != null && request.auth.uid == uid;
       allow update: if isAdmin()
                     || (request.auth != null && request.auth.uid == uid &&
                         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'paypal', 'bankDetails', 'email']))
